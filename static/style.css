@@ -1,0 +1,33 @@
+* {font-family: Arial, Helvetica, sans-serif;
+   font-size: small; }
+
+body {background-color: white; }
+
+input {background-color: lightgrey; }
+textarea {background-color: lightgrey;
+          font-family: monospace; }
+
+h1 {font-size: x-large;
+    margin-left: 3em; }
+
+h2 {font-size: medium;
+    margin-left: 2em;  }
+
+h3 {font-size: small;
+    margin-left: 1em;  }
+
+img {border-width: 0; }
+
+form {padding: 0;
+      margin: 0; }
+
+div.document p {padding: 4px;
+                margin: 0; }
+
+table.body tr th {vertical-align: top; }
+table.body tr td {vertical-align: top; }
+
+table.tags tr th {vertical-align: top; }
+table.tags tr td {vertical-align: top; }
+
+.right {text-align: right; }

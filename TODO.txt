@@ -1,0 +1,47 @@
+To do
+=====
+
+Current version
+---------------
+
+- Tool
+  - implement check_viewable and check_editable properly
+- Protocol
+  - specifies steps to go through for task
+- Task
+  - application of a Protocol to a workset
+  - optionally involves an Instrument? aux_unit?
+  - status: defined, started, finished, aborted
+- Sample
+  - create subsample
+- 'Action' class (or some such name) to perform some operation
+  on an entity satisfying some criterion. Allow display of button to
+  do the action (or automatic after change?), and what is to be done.
+
+- InstrumentRun
+  - report
+    - select parts of run based on project
+    - align with data pipeline
+- Edit data for all samples in a workset simultaneously?
+- Project overview
+- Better CouchDB indexes for lists of entities;
+  all data in a list value, rather than having to use 'include_docs'.
+- Add feature 'retired' or 'archived'
+  - how to do indexing?
+- refactor JSON documents: references should be dicts rather than
+  a simple name string, allowing use of explicit UUIDs:
+  {"id": "11a082d9fac64e8dbf189bf8e3016939",
+   "entity": "sample",
+   "name": "P1" }
+
+Next version
+------------
+
+- Schedule: Time planning for projects, instruments, ...
+  - contains Task instance with start/finish timestamps
+
+Subsequent version
+------------------
+
+- Reagent: type of material used in a Protocol
+- ReagentLot, specific batch of Reagent used according to a Protocol
