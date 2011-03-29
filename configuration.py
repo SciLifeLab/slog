@@ -1,24 +1,18 @@
 """ slog: Simple sample tracker system.
 
-Configuration.
+Configuration to specify version and site.
 
 Per Kraulis
 2011-02-07
+2011-03-29  split out site-specific config info
 """
 
-import socket, re, os.path
+import socket, sys, re, os.path
 
 import couchdb
 
 
-HOSTNAME = socket.gethostname()
-
 VERSION = '1.0'
-
-if HOSTNAME == 'maggie':
-    URL_BASE = 'http://test2.scilifelab.se/slog'
-else:
-    URL_BASE = 'http://localhost/slog'
 
 STATIC_DIR = os.path.join(os.path.dirname(__file__), 'static')
 
@@ -30,20 +24,28 @@ ROLES = ['customer',  # The PI of a project. Can only read his own stuff.
          'admin'      # System administrator. Is allowed to do anything.
          ]
 
+# Load the site-specific configuration info.
+MODULENAME = "slog.site_%s" % socket.gethostname()
+try:
+    __import__(MODULENAME)
+except ImportError:
+    MODULENAME = 'slog.site_default'
+    __import__(MODULENAME)
+site = sys.modules[MODULENAME]
 
 
 def get_db():
-    if HOSTNAME == 'maggie':
-        db = couchdb.Server("http://maggie.scilifelab.se:5984/")['slog']
-        ## db.resource.credentials = ('admin', '250znW6G/Z8!o')
-    else:
-        db = couchdb.Server()['slog']
+    "Get the database instance, possibly with credentials loaded."
+    db = couchdb.Server(site.COUCHDB_SERVER)[site.COUCHDB_DATABASE]
+    if site.COUCHDB_USER and site.COUCHDB_PASSWORD:
+        db.resource.http.add_credentials(site.COUCHDB_USER,
+                                         site.COUCHDB_PASSWORD)
     return db
 
 def get_url(entity, name=None, attachment=None):
     "Return the URL for the item of given entity and name."
     assert entity                       # Entity type
-    parts = [URL_BASE, entity]
+    parts = [site.URL_BASE, entity]
     if name:
         parts.append(name)
     if attachment:

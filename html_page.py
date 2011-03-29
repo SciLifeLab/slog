@@ -26,7 +26,7 @@ class HtmlPage(object):
         self.logo = A(IMG(src=configuration.get_url('static', 'slog.png'),
                           width="107", height="100",
                           alt="slog %s" % configuration.VERSION),
-                      href=configuration.URL_BASE)
+                      href=configuration.site.URL_BASE)
         self.set_header()
         self.set_login()
         self.set_search()
@@ -41,9 +41,14 @@ class HtmlPage(object):
 
     def set_login(self):
         name = self.dispatcher.user['name']
-        self.login = DIV("Login: %s (%s)" %
+        # This is a non-standard way of achieving a logout in several
+        # different browsers, which should include Firefox, Opera and
+        # Safari, but not Internet Explores.
+        logout = "http://logout:byebye@%s" % configuration.site.BASE
+        self.login = DIV("Login: %s (%s) [%s]" %
                          (A(name, href=configuration.get_url('account', name)),
-                          self.dispatcher.user.get('role')))
+                          self.dispatcher.user.get('role'),
+                          A('logout', href=logout)))
 
     def set_search(self):
         self.search = FORM(INPUT(type='text', name='key'),

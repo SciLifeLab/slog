@@ -9,6 +9,13 @@ Per Kraulis
 from slog import configuration, utils
 
 
+def reinit_status(doc):
+    try:
+        del doc['status']
+        return doc
+    except KeyError:
+        pass
+
 def change_multiplex_index_to_multiplex_label(doc):
     try:
         value = doc.pop('multiplex_index')
@@ -167,9 +174,5 @@ def for_all_documents(modify):
     
 
 if __name__ == '__main__':
-    for id, rev in for_all_documents(change_owner_to_operator):
-        print id, rev
-    for id, rev in for_all_documents(change_customername_to_altname):
-        print id, rev
-    for id, rev in for_all_documents(change_multiplex_index_to_multiplex_label):
+    for id, rev in for_all_documents(reinit_status):
         print id, rev

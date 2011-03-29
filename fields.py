@@ -81,9 +81,9 @@ class Field(object):
         "Return the HTML element for editing the current value."
         raise NotImplementedError
 
-    def get_create_form_field(self, entity):
+    def get_create_form_field(self, dispatcher):
         "Return the HTML element for creating the value for a new entity."
-        return self.get_edit_form_field(entity)
+        return self.get_edit_form_field(dispatcher)
 
     def get_value(self, dispatcher, request, required=True):
         """Get the value for the field from the CGI form inputs.
@@ -869,9 +869,17 @@ class SampleGridField(Field):
                             TD(I('undefined'))))
         return TABLE(*trows)
 
+    def get_create_form_field(self, dispatcher):
+        "For simplicity, set arrangement as undefined initially."
+        return I('Initially undefined arrangement.')
+
     def get_value(self, dispatcher, request, required=False):
         "Define the arrangement, and optionally resize the grid."
-        current = dispatcher.doc.get(self.name) or dict()
+        try:
+            doc = dispatcher.doc
+        except AttributeError:          # Undefined when creating the entity.
+            return dict()
+        current = doc.get(self.name) or dict()
         result = dict()
         # Put samples into arrangement, if any
         arrangement = current.get('arrangement')
@@ -1021,8 +1029,8 @@ class SampleLayoutField(Field):
             rows.append(TR(*cells))
         return TABLE(border=1, *rows)
 
-    def get_create_form_field(self, entity):
-        return I('Determined by choice of instrument')
+    def get_create_form_field(self, dispatcher):
+        return I('Determined by choice of instrument.')
 
     def get_value(self, dispatcher, request, required=False):
         array = self.get_array(dispatcher)

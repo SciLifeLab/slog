@@ -133,7 +133,7 @@ class Id(Dispatcher):
             name = doc['name']
         except KeyError:
             raise HTTP_NOT_FOUND
-        url = "%s/%s/%s" % (configuration.URL_BASE, entity, name)
+        url = "%s/%s/%s" % (configuration.site.URL_BASE, entity, name)
         raise HTTP_SEE_OTHER(Location=url)
 
 
