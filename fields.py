@@ -501,19 +501,19 @@ class ReferenceListField(ReferenceField):
 
 
 class StatusField(Field):
-    """Field for a list of statuses with their associated
-    timestamps and values."""
+    "Field for a list of statuses with their associated timestamps and values."
 
     def __init__(self, name, statuses=[], description=None):
         """'statuses' is a list of dictionaries having a number of items:
         'name' (required): the name of the status subfield.
         'values' (optional): a sequence of possible values.
-        'description' (optional): textual description of the status."""
+        'description' (optional): textual description of the status.
+        """
         super(StatusField, self).__init__(name,
                                           required=True,
                                           description=description)
+        # Set the 'statuses' member; check definition
         self.statuses = []
-        # Set the 'statuses' member; check definition of statuses
         names = set()
         for status in statuses:
             name = status['name']       # Must be dict, and have item 'name'
@@ -525,10 +525,9 @@ class StatusField(Field):
         return self.get_view_doc(entity.doc, full=full)
 
     def get_view_doc(self, doc, full=False):
-        try:                                           # Actual subfields;
-            statuses = doc[self.name].copy()           # modifiable copy
-        except KeyError:
-            statuses = dict()
+        statuses = dict()                              # Actual subfields
+        for status in doc.get(self.name, []):
+            statuses[status['name']] = status.copy()
         rows = []
         # Predefined status items
         for status in self.statuses:                   # Possible subfields
@@ -548,7 +547,7 @@ class StatusField(Field):
             rows.append(TR(*cells))
         # Remaining actual status values
         names = statuses.keys()
-        names.sort()                    # XXX other sorting?
+        names.sort()                    # XXX other sort criterion?
         for name in names:
             cells = [TH(name)]
             try:
@@ -564,12 +563,11 @@ class StatusField(Field):
         return TABLE(*rows)
 
     def get_edit_form_field(self, entity):
-        try:
-            statuses = entity.doc.get(self.name) or dict() # Actual subfields
-        except AttributeError:                             # When creating
-            statuses = dict()
+        statuses = dict()                                  # Actual subfields
+        for status in entity.doc.get(self.name, []):
+            statuses[status['name']] = status
         rows = []
-        for status in self.statuses:                   # Possible subfields
+        for status in self.statuses:                       # Possible subfields
             name = status['name']
             try:
                 timestamp = statuses[name].get('timestamp', '')
@@ -601,10 +599,9 @@ class StatusField(Field):
                     action=entity.get_url())
 
     def get_value(self, dispatcher, request, required=False):
-        try:
-            statuses = dispatcher.doc.get(self.name) or dict()# Actual subfields
-        except AttributeError:                                # When creating
-            statuses = dict()
+        statuses = dict()                              # Actual subfields
+        for status in dispatcher.doc.get(self.name, []):
+            statuses[status['name']] = status
         orig_statuses = statuses.copy()
         for status in self.statuses:                   # Possible subfields
             name = status['name']
@@ -621,11 +618,12 @@ class StatusField(Field):
                     except KeyError:
                         pass
                 else:
-                    statuses[name] = dict(timestamp=utils.now_iso(),
+                    statuses[name] = dict(name=name,
+                                          timestamp=utils.now_iso(),
                                           value=value)
         if statuses == orig_statuses:
             raise KeyError("Status '%s' not changed" % self.name)
-        return self.check_value(dispatcher, statuses)
+        return self.check_value(dispatcher, statuses.values())
 
     def check_value(self, dispatcher, value):
         "No check needed for this field, by default."
