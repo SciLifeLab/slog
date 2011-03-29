@@ -98,7 +98,8 @@ such as a task. The set has the following properties:
     def get_arranged_samples(self):
         """Get a dictionary of samples placed in the arrangement.
         Key: sample name.
-        Value: arrangement coordinate (row, column, multiplex)."""
+        Value: arrangement coordinate (row, column, multiplex).
+        """
         grid = self.doc.get('grid') or dict()
         arrangement = grid.get('arrangement') or []
         result = dict()
@@ -119,7 +120,6 @@ such as a task. The set has the following properties:
                     if sample is None: continue
                     if sample not in samples:
                         column[k] = None
-        logging.info("cleanup_arranged_samples %s", arrangement)
 
 
 class WorksetCreate(EntityCreate):
@@ -187,7 +187,7 @@ class Worksets(Dispatcher):
                 operator = A(operator, href=url)
             else:
                 operator = ''
-            samples = workset.get('samples')
+            samples = workset.get('samples', [])
             for i, sample in enumerate(samples):
                 url = configuration.get_url('sample', sample)
                 samples[i] = str(A(sample, href=url))
