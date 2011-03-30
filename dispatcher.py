@@ -29,6 +29,7 @@ class Dispatcher(BaseDispatcher):
                 raise ValueError
         except ValueError:
             raise HTTP_UNAUTHORIZED_BASIC_CHALLENGE(realm='slog')
+        self.user_agent = request.environ.get('HTTP_USER_AGENT')
 
     def get_named_document(self, entity, name):
         """Get the document for the given entity and name.

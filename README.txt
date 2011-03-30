@@ -85,6 +85,11 @@ timestamp
     Date and time (ISO format) of the modification producing the current
     revision of the document.
 
+tool
+    A software component that operates on a sample, project, or other
+    entity to change it, produce other entities, or to do something else.
+    The available tools depend on the site.
+
 user
     A person interacting with the system.
     All access to slog requires login to an existing account.

@@ -28,7 +28,15 @@ class HtmlPage(object):
                           alt="slog %s" % configuration.VERSION),
                       href=configuration.site.URL_BASE)
         self.set_header()
-        self.set_login()
+        # Logout is possible only for Firefox, Safari and Opera
+        logout = False
+        if dispatcher.user_agent:
+            user_agent = dispatcher.user_agent.lower()
+            for signature in ['firefox', 'opera', 'safari']:
+                if signature in user_agent:
+                    logout = True
+                    break
+        self.set_login(logout=logout)
         self.set_search()
         self.set_navigation()
         self.state = []                 # Current state of the entity
@@ -39,16 +47,18 @@ class HtmlPage(object):
     def set_header(self):
         self.header = H1(self.title)
 
-    def set_login(self):
+    def set_login(self, logout=True):
         name = self.dispatcher.user['name']
         # This is a non-standard way of achieving a logout in several
         # different browsers, which should include Firefox, Opera and
         # Safari, but not Internet Explores.
-        logout = "http://logout:byebye@%s" % configuration.site.BASE
-        self.login = DIV("Login: %s (%s) [%s]" %
-                         (A(name, href=configuration.get_url('account', name)),
-                          self.dispatcher.user.get('role'),
-                          A('logout', href=logout)))
+        href = configuration.get_url('account', name)
+        msg = "Login: %s (%s)" % (A(name, href=href),
+                                  self.dispatcher.user.get('role'))
+        if logout:
+            href = "http://logout:byebye@%s" % configuration.site.BASE
+            msg += " [%s]" % A('logout', href=href)
+        self.login = DIV(msg)
 
     def set_search(self):
         self.search = FORM(INPUT(type='text', name='key'),
