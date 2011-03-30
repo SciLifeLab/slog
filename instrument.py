@@ -34,6 +34,9 @@ describing the layout of the samples in one run."""
                           description='Descriptive one-liner, nickname.'),
               StringField('type', required=True,
                           description='Type of instrument: company and model.'),
+              ReferenceField('owner', 'account',
+                             required=False,
+                             description='Person responsible for the instrument.'),
               IntegerField('max_rows', required=True, default=1,
                            description="The maximum number of rows (or similar)"
                            " in the instrument's sample array."),

@@ -74,6 +74,7 @@ and 'number' is the consecutive number of the project in that year."""),
 
     def get_editable(self, user):
         "Everyone except customer may edit any project."
+        if self.locked: return False
         return user.get('role') in ('admin', 'manager', 'engineer')
 
     def view(self, page):

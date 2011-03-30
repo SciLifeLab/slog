@@ -96,7 +96,7 @@ which determines the access privileges. The possible roles are:
             url = configuration.get_url('workset', doc['name'])
             workset = A(doc['name'], href=url)
             rows.append(TR(TD(workset),
-                           TD(str(len(doc['samples']))),
+                           TD(str(len(doc.get('samples', [])))),
                            TD(doc['timestamp'])))
         page.append(P(TABLE(border=1, *rows)))
 
@@ -128,6 +128,7 @@ which determines the access privileges. The possible roles are:
     def get_editable(self, user):
         """A user may edit his own account.
         A 'manager' may edit an 'engineer' or 'customer' account."""
+        if self.locked: return False
         role = user.get('role')
         if role == 'admin': return True
         if self.doc.id == user.id: return True

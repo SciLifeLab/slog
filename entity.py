@@ -26,6 +26,10 @@ class Entity(Dispatcher):
         for field in cls.fields:
             if field.name == name: return field
 
+    @property
+    def locked(self):
+        return bool(self.doc.get('locked'))
+
     def get_url(self):
         "Return the absolute URL for this entity."
         return configuration.get_url(self.__class__.__name__.lower(),
