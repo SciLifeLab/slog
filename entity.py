@@ -30,6 +30,27 @@ class Entity(Dispatcher):
     def locked(self):
         return bool(self.doc.get('locked'))
 
+    def get_editable(self, user, check_lock=True):
+        """Is the given user allowed to edit this page?
+        NOTE: First check that the entity is not locked. Then check that
+        the user is allowed to edit using 'get_editable_privilege'.
+        """
+        if check_lock and self.locked: return False
+        return self.get_editable_privilege(user)
+
+    def check_editable(self, user, check_lock=True):
+        "Check that the given user is allowed to edit this page."
+        if check_lock and self.locked:
+            raise HTTP_CONFLICT("Entity '%s' is locked." % self)
+        if not self.get_editable(user, check_lock=False):
+            raise HTTP_FORBIDDEN("User '%s' may not edit page." % user['name'])
+
+    def get_editable_privilege(self, user):
+        """Is the given user allowed to edit this page?
+        By default, only the role 'admin' is allowed to edit any page.
+        """
+        return user.get('role') == 'admin'
+
     def get_url(self):
         "Return the absolute URL for this entity."
         return configuration.get_url(self.__class__.__name__.lower(),
@@ -78,6 +99,7 @@ class Entity(Dispatcher):
         self.view_attachments(page)
         self.view_tools(page)
         self.view_log(page)
+        self.view_locked(page)
         self.view_tags(page)
         self.view_xrefs(page)
 
@@ -156,6 +178,22 @@ class Entity(Dispatcher):
                                 href=configuration.get_url('doc', doc.id)))))
         page.log = DIV(H2('Log'),
                        TABLE(border=1, *rows))
+
+    def view_locked(self, page):
+        if self.locked:
+            img = IMG(src=configuration.get_url('static', 'locked.png'),
+                      alt='locked')
+            button = INPUT(type='submit', value='Unlock')
+            value = INPUT(type='hidden', name='locked', value='false')
+        else:
+            img = IMG(src=configuration.get_url('static', 'unlocked.png'),
+                      alt='unlocked')
+            button = INPUT(type='submit', value='Lock')
+            value = INPUT(type='hidden', name='locked', value='true')
+        page.lock = TABLE(TR(TD(img),
+                             TD(FORM(button, value,
+                                     method='POST',
+                                     action=self.get_url()))))
 
     def view_tags(self, page):
         tags = self.doc.get('tags', [])
@@ -328,7 +366,8 @@ class Entity(Dispatcher):
 
     def POST(self, request, response):
         "Modify according to which CGI inputs were provided."
-        self.check_editable(self.user)
+        # Check edit privilege
+        self.check_editable(self.user, check_lock=False)
         self.check_revision(request)
 
         # Save initial document state
@@ -337,27 +376,43 @@ class Entity(Dispatcher):
         except (AttributeError, TypeError):
             initial = None
 
-        # Get user comment, if any
+        # Get user comment for the change, if any
         try:
-            comment = request.cgi_fields['comment'].value
+            comment = request.cgi_fields['_comment'].value
         except KeyError:
             comment = None
         else:
             comment = comment.strip()
             comment = comment.replace('\r\n', '\n')
 
-        # Data fields
         modified = []                   # Names of fields that were modified
-        for field in self.fields:
-            if not field.get_editable(self, self.user): continue
-            try:
-                self.doc[field.name] = field.get_value(self, request)
-            except KeyError:            # No such field in CGI inputs
-                pass
-            except ValueError, msg:
-                raise HTTP_BAD_REQUEST(str(msg))
-            else:
-                modified.append(field.name)
+
+        try:
+            locked = request.cgi_fields['locked'].value.lower()
+            if locked not in ('false', 'true'):
+                raise HTTP_BAD_REQUEST("invalid 'locked' value '%s'" % locked)
+        except KeyError:
+            locked = None
+
+        if self.locked:                 # If locked, only 'unlock' is possible
+            if locked == 'false':
+                self.doc['locked'] = False
+                modified.append('locked')
+        elif locked is not None:        # 'lock' operation must be the only one
+            if locked == 'true':
+                self.doc['locked'] = True
+                modified.append('locked')
+        else:                           # Change in data field(s)
+            for field in self.fields:
+                if not field.get_editable(self, self.user): continue
+                try:
+                    self.doc[field.name] = field.get_value(self, request)
+                except KeyError:            # No such field in CGI inputs
+                    pass
+                except ValueError, msg:
+                    raise HTTP_BAD_REQUEST(str(msg))
+                else:
+                    modified.append(field.name)
         if modified:
             if initial is None:
                 action = 'created'

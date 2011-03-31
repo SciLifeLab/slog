@@ -72,9 +72,8 @@ and 'number' is the consecutive number of the project in that year."""),
         if user.get('role') in ('admin', 'manager', 'engineer'): return True
         return user['name'] == self.doc['customer']
 
-    def get_editable(self, user):
+    def get_editable_privilege(self, user):
         "Everyone except customer may edit any project."
-        if self.locked: return False
         return user.get('role') in ('admin', 'manager', 'engineer')
 
     def view(self, page):
@@ -83,6 +82,7 @@ and 'number' is the consecutive number of the project in that year."""),
         self.view_samples(page)
         self.view_attachments(page)
         self.view_log(page)
+        self.view_locked(page)
         self.view_tags(page)
         self.view_xrefs(page)
 

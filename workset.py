@@ -54,7 +54,7 @@ such as a task. The set has the following properties:
                               ' samples from the arrangement.'),
               TextField('description')]
 
-    def get_editable(self, user):
+    def get_editable_privilege(self, user):
         "Everyone except customer may edit any project."
         return user.get('role') in ('admin', 'manager', 'engineer')
 
@@ -64,6 +64,7 @@ such as a task. The set has the following properties:
         self.view_tasks(page)
         self.view_attachments(page)
         self.view_log(page)
+        self.view_locked(page)
         self.view_tags(page)
         self.view_xrefs(page)
 

@@ -75,7 +75,7 @@ and instruments."""
                                  ' protocol is relevant.'),
               TextField('description')]
 
-    def get_editable(self, user):
+    def get_editable_privilege(self, user):
         """Is the given user allowed to edit this page?
         Roles 'admin' and 'manager' may edit a protocol."""
         return user.get('role') in ('admin', 'manager')
@@ -86,6 +86,7 @@ and instruments."""
         self.view_tasks(page)
         self.view_attachments(page)
         self.view_log(page)
+        self.view_locked(page)
         self.view_tags(page)
         self.view_xrefs(page)
 

@@ -63,7 +63,7 @@ is involved."""
         Everyone except 'customer' may view the task."""
         return user.get('role') in ('admin', 'manager', 'engineer')
 
-    def get_editable(self, user):
+    def get_editable_privilege(self, user):
         """Is the given user allowed to edit this entity?
         Everyone except 'customer' may edit the task."""
         return user.get('role') in ('admin', 'manager', 'engineer')

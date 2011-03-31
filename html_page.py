@@ -40,6 +40,7 @@ class HtmlPage(object):
         self.set_search()
         self.set_navigation()
         self.state = []                 # Current state of the entity
+        self.lock = ''
         self.meta = []
         self.log = ''
         self.context = "slog %s" % configuration.VERSION
@@ -110,7 +111,8 @@ class HtmlPage(object):
         body = BODY(TABLE(TR(TH(self.logo, width='8%'),
                              TD(self.header),
                              TD(TABLE(TR(TD(self.login)),
-                                      TR(TD(self.search))))),
+                                      TR(TD(self.search)),
+                                      TR(TD(self.lock))))),
                           TR(TD(self.navigation, rowspan=2),
                              TD(*state),
                              TD(rowspan=2, *self.meta)),

@@ -54,6 +54,7 @@ describing the layout of the samples in one run."""
         self.view_protocols(page)
         self.view_attachments(page)
         self.view_log(page)
+        self.view_locked(page)
         self.view_tags(page)
         self.view_xrefs(page)
 
@@ -85,7 +86,7 @@ class InstrumentCreate(EntityCreate):
 class Instruments(Dispatcher):
     "Instrument list dispatcher."
 
-    def get_editable(self, user):
+    def get_editable_privilege(self, user):
         "Only admin and manager may create an instrument."
         return user.get('role') in ('admin', 'manager')
 

@@ -68,7 +68,7 @@ class Field(object):
                TD(I(self.required and 'required' or 'optional')),
                TD(self.get_description())),
             TR(TH('comment'),           # Log entry comment
-               TD(TEXTAREA(name='comment', cols=60, rows=3)),
+               TD(TEXTAREA(name='_comment', cols=60, rows=3)),
                TD(I('optional')),
                TD('Describe the reason for the change.')),
             TR(TD(),

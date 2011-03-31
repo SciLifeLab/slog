@@ -89,6 +89,7 @@ It may be a member of any number of worksets."""
         self.view_worksets(page)
         self.view_attachments(page)
         self.view_log(page)
+        self.view_locked(page)
         self.view_tags(page)
         self.view_xrefs(page)
 
@@ -113,7 +114,7 @@ It may be a member of any number of worksets."""
                            TD(doc['timestamp'])))
         page.append(TABLE(border=1, *rows))
 
-    def get_editable(self, user):
+    def get_editable_privilege(self, user):
         "Anyone except the customer may edit a sample."
         return user.get('role') in ('admin', 'manager', 'engineer')
 

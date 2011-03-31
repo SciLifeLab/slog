@@ -41,6 +41,7 @@ of samples."""
         self.view_projects(page)
         self.view_attachments(page)
         self.view_log(page)
+        self.view_locked(page)
         self.view_tags(page)
         self.view_xrefs(page)
 

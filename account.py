@@ -36,8 +36,10 @@ class RoleField(OptionField):
                                         description=description)
 
     def get_editable(self, dispatcher, user):
-        """Allow only for 'admin' role, but disallow if the document
+        """The document must not be locked.
+        Allow only for 'admin' role, but disallow if the document
         is the predefined 'system' account."""
+        if dispatcher.doc.get('locked'): return False
         return user.get('role') == 'admin' and \
                dispatcher.doc['name'] != 'system'
 
@@ -80,6 +82,7 @@ which determines the access privileges. The possible roles are:
         self.view_worksets(page)
         self.view_attachments(page)
         self.view_log(page)
+        self.view_locked(page)
         self.view_image(page)
         self.view_tags(page)
         self.view_xrefs(page)
@@ -125,10 +128,9 @@ which determines the access privileges. The possible roles are:
                                                                filename)))
                 return
 
-    def get_editable(self, user):
+    def get_editable_privilege(self, user):
         """A user may edit his own account.
         A 'manager' may edit an 'engineer' or 'customer' account."""
-        if self.locked: return False
         role = user.get('role')
         if role == 'admin': return True
         if self.doc.id == user.id: return True

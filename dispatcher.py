@@ -185,13 +185,17 @@ class Attachment(Dispatcher):
 
     def get_viewable(self, user):
         """All except customer may view the attachment.
-        Customer may view only if owner of the document."""
+        Customer may view only if owner of the document.
+        """
         if user.get('role') in ('admin', 'manager', 'engineer'):
             return True
         return user['name'] == self.doc.get('owner')
 
     def get_editable(self, user):
-        "All except customer may edit the attachment."
+        """The parent document must not be locked.
+        All except customer may edit the attachment.
+        """
+        if self.doc.get('locked'): return False
         return user.get('role') in ('admin', 'manager', 'engineer')
 
     def GET(self, request, response):
