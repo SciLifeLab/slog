@@ -77,6 +77,10 @@ role
 sample
     Specific material to be analyzed.
 
+tag
+    A simple name or phrase attached to an entity, for classification and
+    for search purposes.
+
 title
     A one-line description of an entity.
     May contain several words, be non-unique, or empty.
@@ -93,3 +97,8 @@ tool
 user
     A person interacting with the system.
     All access to slog requires login to an existing account.
+
+xref
+    A cross reference from an entity to an external item. May be an explicit
+    URL (http://...) or a URN (urn:database:key), which may be processed by
+    the system into a clickable URL link.

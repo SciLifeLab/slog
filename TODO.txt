@@ -4,6 +4,17 @@ To do
 Current version
 ---------------
 
+- Interface
+  - Immediate-response option selection for "operator" in several list views.
+  - Current sample arrangement in workset is hard to understand;
+    try implementing drag-and-drop.
+  - Same sample must be allowed in several cells in arrangement.
+  - The log doc should be viewable in same way as entity.
+
+- Multiplex_sequence must be a direct function of multiplex_label, not
+  independently changeable.
+- Check: does add samples from a project to a workset work?
+
 - Tool
   - implement check_viewable and check_editable properly
 - Protocol
