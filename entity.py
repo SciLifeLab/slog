@@ -394,11 +394,13 @@ class Entity(Dispatcher):
         except KeyError:
             locked = None
 
-        if self.locked:                 # If locked, only 'unlock' is possible
+        if self.locked:                 # If locked, only 'unlock' is allowed
             if locked == 'false':
                 self.doc['locked'] = False
                 modified.append('locked')
-        elif locked is not None:        # 'lock' operation must be the only one
+            else:
+                raise HTTP_CONFLICT("Entity '%s' is locked." % self)
+        elif locked is not None:        # Only 'lock' operation is relevant
             if locked == 'true':
                 self.doc['locked'] = True
                 modified.append('locked')
