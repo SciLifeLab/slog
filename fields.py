@@ -736,15 +736,16 @@ class SampleSetField(Field):
             pass
         else:
             updated_samples.update(samples)
+
         # Add samples from given project, if any
         try:
-            project = dispatcher.project
-            if project is None: raise AttributeError
-        except AttributeError:
+            project = request.cgi_fields['project'].value.strip()
+            if project is None: raise KeyError
+        except (KeyError, ValueError):
             pass
         else:
             view = dispatcher.db.view('sample/project')
-            updated_samples.update([r.value for r in view[project['name']]])
+            updated_samples.update([r.value for r in view[project]])
 
         # Add samples from given workset, if any
         try:

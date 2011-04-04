@@ -8,9 +8,7 @@ Current version
 - Feature
   - results: allow adding paths, links to result files/directories
   - driver's license: limit actions protocol to instrument-accredited persons
-  - sample location
   - project report: all that has happened
-  - sample status: returned to customer
   - workset grid: show example for plating 24, 96 vs 384, combinations
   - sample upload: give prefix for consecutive numbers from XLS file
   - already plated samples: given coord in XLS file, create worksets!
@@ -19,12 +17,11 @@ Current version
   - Immediate-response option selection for "operator" in several list views.
   - Current sample arrangement in workset is hard to understand;
     try implementing drag-and-drop.
-  - Same sample must be allowed in several cells in arrangement.
   - The log doc should be viewable in same way as entity.
 
 - Multiplex_sequence must be a direct function of multiplex_label, not
   independently changeable.
-- Check: does add samples from a project to a workset work?
+- Workset arrangement: Same sample must be allowed in several cells
 
 - Tool
   - implement check_viewable and check_editable properly
