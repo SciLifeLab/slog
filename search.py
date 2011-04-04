@@ -42,6 +42,7 @@ class Search(Dispatcher):
                            'task',
                            'instrument']:
                 # Search 'name' field
+                logging.info("search index %s", entity)
                 view = self.db.view("%s/name" % entity)
                 for row in view[key : "%sZZZZZZ" % key]:
                     result.add((entity, row.key))
@@ -49,7 +50,7 @@ class Search(Dispatcher):
                 view = self.db.view("%s/tag" % entity)
                 for row in view[key : "%sZZZZZZ" % key]:
                     result.add((entity, row.value))
-            # Special case for altname in sample
+            # Special case for altname in Sample entities
             view = self.db.view("sample/altname")
             for row in view[key : "%sZZZZZZ" % key]:
                 result.add((entity, row.key))

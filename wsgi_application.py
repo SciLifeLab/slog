@@ -24,7 +24,7 @@ from slog.tool import ToolDispatcher
 from slog.dispatcher import Id, Doc, Static, Attachment
 
 
-logging.basicConfig(level=logging.DEBUG)
+logging.basicConfig(level=logging.INFO)
 
 
 application = WsgiApplication(human_debug_output=True)
