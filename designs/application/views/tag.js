@@ -1,4 +1,4 @@
-/* Index application documents by tag.
+/* Index 'application' documents by tag.
    Value: name. */
 function(doc) {
     if (doc.entity !== 'application') return;

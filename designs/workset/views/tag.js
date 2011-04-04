@@ -1,4 +1,4 @@
-/* Index workset documents by tag.
+/* Index 'workset' documents by tag.
    Value: name. */
 function(doc) {
     if (doc.entity !== 'workset') return;

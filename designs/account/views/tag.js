@@ -1,4 +1,4 @@
-/* Index account documents by tag.
+/* Index 'account' documents by tag.
    Value: name. */
 function(doc) {
     if (doc.entity !== 'account') return;

@@ -32,7 +32,7 @@ class Search(Dispatcher):
                            action=configuration.get_url('search'))))
         result = set()
         if key:
-            # Search fields occurring in all entities
+            # Search 'name' and 'tag' fields in all entities
             for entity in ['account',
                            'project',
                            'sample',
@@ -41,16 +41,21 @@ class Search(Dispatcher):
                            'protocol',
                            'task',
                            'instrument']:
-                # Search 'name' field
-                logging.info("search index %s", entity)
                 view = self.db.view("%s/name" % entity)
                 for row in view[key : "%sZZZZZZ" % key]:
                     result.add((entity, row.key))
-                # Search 'tags' field
                 view = self.db.view("%s/tag" % entity)
                 for row in view[key : "%sZZZZZZ" % key]:
                     result.add((entity, row.value))
-            # Special case for altname in Sample entities
+            # Search 'operator' field in Project, Workset, Task, Instrument
+            for entity in ['project',
+                           'workset',
+                           'task',
+                           'instrument']:
+                view = self.db.view("%s/operator" % entity)
+                for row in view[key : "%sZZZZZZ" % key]:
+                    result.add((entity, row.value))
+            # Search 'altname' in Sample entities
             view = self.db.view("sample/altname")
             for row in view[key : "%sZZZZZZ" % key]:
                 result.add((entity, row.key))

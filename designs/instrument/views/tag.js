@@ -1,4 +1,4 @@
-/* Index instrument documents by tag.
+/* Index 'instrument' documents by tag.
    Value: name. */
 function(doc) {
     if (doc.entity !== 'instrument') return;

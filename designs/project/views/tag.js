@@ -1,4 +1,4 @@
-/* Index project documents by tag.
+/* Index 'project' documents by tag.
    Value: name. */
 function(doc) {
     if (doc.entity !== 'project') return;

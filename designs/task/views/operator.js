@@ -1,6 +1,6 @@
 /* Index 'task' documents by operator.
-   Value: null. */
+   Value: name. */
 function(doc) {
     if (doc.entity !== 'task') return;
-    emit(doc.operator, null);
+    emit(doc.operator, doc.name);
 }

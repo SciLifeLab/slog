@@ -1,4 +1,4 @@
-/* Index sample documents by tag.
+/* Index 'sample' documents by tag.
    Value: name. */
 function(doc) {
     if (doc.entity !== 'sample') return;
