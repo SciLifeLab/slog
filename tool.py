@@ -1,6 +1,6 @@
 """ slog: Simple sample tracker system.
 
-Tool dispatcher and abstract base tool class.
+Tool dispatcher and abstract base tool class. NOTE: this is not an entity!
 
 Per Kraulis
 2011-03-10

@@ -62,15 +62,21 @@ which determines the access privileges. The possible roles are:
 
 """
 
-    fields = [AccountNameField('name', required=True, fixed=True,
+    fields = [AccountNameField('name',
+                               required=True,
+                               fixed=True,
                                description='Unique user account identifier.'
                                ' Cannot be changed once set.'),
               PasswordField('password'),
-              RoleField('role', required=True, default='customer',
+              RoleField('role',
+                        required=True,
+                        default='customer',
                         description='Access privilege role.'),
-              StringField('fullname', size=40,
+              StringField('fullname',
+                          size=40,
                           description="Full name as 'surname, given name'."),
-              StringField('initials', size=4,
+              StringField('initials',
+                          size=4,
                           description='Initials of the full name.'),
               TextField('address'),
               StringField('email', size=60),

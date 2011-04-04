@@ -28,20 +28,25 @@ class Sample(Entity):
 It is always part of one and only one project.
 It may be a member of any number of worksets."""
 
-    fields = [SampleNameField('name', required=True, fixed=True,
+    fields = [SampleNameField('name',
+                              required=True,
+                              fixed=True,
                               description='Unique sample identifier.'
                               ' Cannot be changed once set.'),
-              StringField('altname', required=False,
+              StringField('altname',
+                          required=False,
                           description="Alternative name, such as"
                           " customer's name for sample."),
-              ReferenceField('project', 'project',
+              ReferenceField('project',
+                             referred='project',
                              required=True,
                              description='Project for the sample.'),
               StringField('reference',
                           required=False,
                           description='Reference genome or species'
                           ' for the sample.'),
-              ReferenceField('parent', 'sample',
+              ReferenceField('parent',
+                             referred='sample',
                              required=False,
                              fixed=True,
                              description='Sample from which this was derived.'

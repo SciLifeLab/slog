@@ -36,16 +36,22 @@ such as a task. The set has the following properties:
 
 """
 
-    fields = [NameField('name', required=True, fixed=True,
+    fields = [NameField('name',
+                        required=True,
+                        fixed=True,
                         description='Unique workset identifier.'
                         ' Cannot be changed once set.'),
-              ReferenceField('operator', 'account', required=True,
+              ReferenceField('operator',
+                             referred='account',
+                             required=True,
                              default=utils.get_login_account,
-                             description='The user account responsible'
-                             ' for this workset.'),
-              SampleSetField('samples', required=True,
+                             description='The user responsible for'
+                             ' this workset.'),
+              SampleSetField('samples',
+                             required=True,
                              description='The set of samples.'),
-              SampleGridField('grid', required=True,
+              SampleGridField('grid',
+                              required=True,
                               description='Arrangement of the samples'
                               ' in a grid of specified dimensions.'
                               ' All dimension sizes must be positive integers'

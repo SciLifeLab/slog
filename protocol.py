@@ -60,17 +60,22 @@ the samples in the workset of a task are to be taken through.
 The protocol may be associated with any number of applications
 and instruments."""
 
-    fields = [ProtocolNameField('name', required=True, fixed=True,
+    fields = [ProtocolNameField('name',
+                                required=True,
+                                fixed=True,
                                 description='Unique protocol identifier.'
                                 ' Cannot be changed once set.'),
-              StepsDefinitionField('steps', required=True,
+              StepsDefinitionField('steps',
+                                   required=True,
                                    description='The steps that the task and'
                                    ' the samples in its workset are to be'
                                    ' taken through.'),
-              ReferenceListField('applications', 'application',
+              ReferenceListField('applications',
+                                 referred='application',
                                  description='Applications for which this'
                                  ' protocol is relevant.'),
-              ReferenceListField('instruments', 'instrument',
+              ReferenceListField('instruments',
+                                 referred='instrument',
                                  description='Instruments for which this'
                                  ' protocol is relevant.'),
               TextField('description')]

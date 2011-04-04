@@ -28,7 +28,9 @@ class Project(Entity):
 application. The samples belong to this and only this project.
 The customer is usually the Principal Investigator (PI) of the project."""
 
-    fields = [ProjectNameField('name', required=True, fixed=True,
+    fields = [ProjectNameField('name',
+                               required=True,
+                               fixed=True,
                                description=\
 """The SciLifeLab name of the project. The name must be unique among projects.
 It is set at creation and cannot be changed. It has the form
@@ -41,7 +43,14 @@ and 'number' is the consecutive number of the project in that year."""),
                              referred='account',
                              required=True,
                              description='The PI of the project.'),
-              ReferenceField('application', 'application',
+              ReferenceField('operator',
+                             referred='account',
+                             required=True,
+                             default=utils.get_login_account,
+                             description='The user responsible for'
+                             ' overseeing this project.'),
+              ReferenceField('application',
+                             referred='application',
                              required=True,
                              description="Experimental strategy."),
               StringField('reference',

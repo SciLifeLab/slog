@@ -27,23 +27,34 @@ class Instrument(Entity):
     """An instrument (sequencer, robot, analyzer, etc.) with a specification
 describing the layout of the samples in one run."""
 
-    fields = [InstrumentNameField('name', required=True, fixed=True,
+    fields = [InstrumentNameField('name',
+                                  required=True,
+                                  fixed=True,
                                   description='Unique instrument identifier.'
                                   ' Cannot be changed once set.'),
               StringField('label',
                           description='Descriptive one-liner, nickname.'),
-              StringField('type', required=True,
+              StringField('type',
+                          required=True,
                           description='Type of instrument: company and model.'),
-              ReferenceField('owner', 'account',
+              ReferenceField('operator',
+                             referred='account',
                              required=False,
-                             description='Person responsible for the instrument.'),
-              IntegerField('max_rows', required=True, default=1,
+                             description='The person responsible for'
+                             ' the instrument.'),
+              IntegerField('max_rows',
+                           required=True,
+                           default=1,
                            description="The maximum number of rows (or similar)"
                            " in the instrument's sample array."),
-              IntegerField('max_columns', required=True, default=1,
+              IntegerField('max_columns',
+                           required=True,
+                           default=1,
                            description="The maximum number of columns (lanes,"
                            " or similar) in the instrument's sample array."),
-              IntegerField('max_multiplex', required=True, default=1,
+              IntegerField('max_multiplex',
+                           required=True,
+                           default=1,
                            description="The maximum number of samples in"
                            " each lane/well of the instrument's sample array."),
               TextField('description')]

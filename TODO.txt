@@ -6,8 +6,7 @@ Current version
 
 - Mail till Päivi om när funkar bättre. Affy-gruppen ?
 - Bugs:
-  - Search: lacking some index! tool?
-  - account created must show!
+  - account which created entity must show!
 - Feature
   - results: paths, links. Show!
   - driver's license: limit actions to accredited persons

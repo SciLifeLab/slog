@@ -31,29 +31,41 @@ The protocol determines the sequence of steps through which the samples
 are to be taken. A task is the same as an instrument run if an instrument
 is involved."""
 
-    fields = [TaskNameField('name', required=True, fixed=True,
+    fields = [TaskNameField('name',
+                            required=True,
+                            fixed=True,
                             description='Unique task identifier.'
                             ' Cannot be changed once set.'),
-              StringField('altname', required=False,
+              StringField('altname',
+                          required=False,
                           description='Alternative name, such as an'
                           ' instrument run name.'),
-              ReferenceField('protocol', 'protocol', required=True, fixed=True,
+              ReferenceField('protocol', 'protocol',
+                             required=True,
+                             fixed=True,
                              description='The protocol controlling this task.'
                             ' Cannot be changed once set.'),
-              ReferenceField('workset', 'workset', required=False, fixed=True,
+              ReferenceField('workset',
+                             referred='workset',
+                             required=False,
+                             fixed=True,
                              description='The sample workset to which'
                              ' the protocol will be applied.'
                              ' Cannot be changed once set.'),
-              ReferenceField('instrument', 'instrument', required=False,
+              ReferenceField('instrument', 'instrument',
+                             required=False,
                              description='The instrument used, if any.'),
-              StringField('aux_unit', required=False,
+              StringField('aux_unit',
+                          required=False,
                           description='Auxiliary instrument unit used, if any.'
                           ' This is an identifier for a flowcell, array,'
                           ' or other essential unit.'),
-              ReferenceField('operator', 'account', required=True,
+              ReferenceField('operator',
+                             referred='account',
+                             required=True,
                              default=utils.get_login_account,
-                             description='The user account responsible'
-                             ' for executing this task.'),
+                             description='The user responsible for'
+                             ' executing this task.'),
               TextField('description')]
 
     tool_classes = [illumina_samplesheet.Tool]

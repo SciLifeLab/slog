@@ -27,7 +27,9 @@ class Application(Entity):
     """An application is an overall strategy for the analysis of a set
 of samples."""
 
-    fields = [ApplicationNameField('name', required=True, fixed=True,
+    fields = [ApplicationNameField('name',
+                                   required=True,
+                                   fixed=True,
                                    description='Unique application identifier.'
                                    ' Cannot be changed once set.'),
               StringField('label',
