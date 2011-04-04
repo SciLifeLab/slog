@@ -5,11 +5,9 @@ Current version
 ---------------
 
 - Mail till Päivi om när funkar bättre. Affy-gruppen ?
-- Bugs:
-  - account which created entity must show!
 - Feature
-  - results: paths, links. Show!
-  - driver's license: limit actions to accredited persons
+  - results: allow adding paths, links to result files/directories
+  - driver's license: limit actions protocol to instrument-accredited persons
   - sample location
   - project report: all that has happened
   - sample status: returned to customer
