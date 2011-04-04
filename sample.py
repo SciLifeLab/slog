@@ -212,7 +212,9 @@ class SampleCreate(EntityCreate):
             sample = dict(_id=utils.id_uuid(),
                           entity='sample',
                           project=self.project['name'],
-                          status='defined',
+                          status=[dict(name='defined',
+                                       value='yes',
+                                       timestamp=utils.now_iso())],
                           timestamp=utils.now_iso())
             for key, converter in [('name', str),
                                    ('altname', str),

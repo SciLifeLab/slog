@@ -4,6 +4,20 @@ To do
 Current version
 ---------------
 
+- Mail till Päivi om när funkar bättre. Affy-gruppen ?
+- Bugs:
+  - Search: lacking some index! tool?
+  - account created must show!
+- Feature
+  - results: paths, links. Show!
+  - driver's license: limit actions to accredited persons
+  - sample location
+  - project report: all that has happened
+  - sample status: returned to customer
+  - workset grid: show example for plating 24, 96 vs 384, combinations
+  - sample upload: give prefix for consecutive numbers from XLS file
+  - already plated samples: given coord in XLS file, create worksets!
+
 - Interface
   - Immediate-response option selection for "operator" in several list views.
   - Current sample arrangement in workset is hard to understand;

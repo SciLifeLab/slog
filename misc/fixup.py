@@ -9,7 +9,17 @@ Per Kraulis
 from slog import configuration, utils
 
 
+def reinit_sample_status(doc):
+    "Remove status entry for all sample documents."
+    if doc.get('entity') != 'sample': return
+    try:
+        del doc['status']
+        return doc
+    except KeyError:
+        pass
+
 def reinit_status(doc):
+    "Remove status entry for all documents."
     try:
         del doc['status']
         return doc
@@ -174,5 +184,5 @@ def for_all_documents(modify):
     
 
 if __name__ == '__main__':
-    for id, rev in for_all_documents(reinit_status):
+    for id, rev in for_all_documents(reinit_sample_status):
         print id, rev
