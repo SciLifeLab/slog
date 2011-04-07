@@ -4,31 +4,39 @@ To do
 Current version
 ---------------
 
-- Mail till Päivi om när funkar bättre. Affy-gruppen ?
-- Feature
-  - results: allow adding paths, links to result files/directories
-  - driver's license: limit actions protocol to instrument-accredited persons
+- Change name of 'tool' to 'plugin'? Or other name?
+
+- Application: get rid of this entity? Instead: List of tasks (with protocol)
+  for a project, to be created by manager.
+
+- Features
+  - Results: allow adding paths, links to result files/directories
+  - Driver's license: account has associated protocols 'licensed'
   - project report: all that has happened
   - workset grid: show example for plating 24, 96 vs 384, combinations
   - sample upload: give prefix for consecutive numbers from XLS file
   - already plated samples: given coord in XLS file, create worksets!
 
+- Unit tests
+
 - Interface
+  - Description field higher up in display
+  - Smaller font for field descriptions? (ReST option?)
   - Immediate-response option selection for "operator" in several list views.
   - Current sample arrangement in workset is hard to understand;
     try implementing drag-and-drop.
   - The log doc should be viewable in same way as entity.
 
-- Multiplex_sequence must be a direct function of multiplex_label, not
+- Multiplex_sequence should be a direct function of multiplex_label, not
   independently changeable.
-- Workset arrangement: Same sample must be allowed in several cells
 
 - Tool
   - implement check_viewable and check_editable properly
+  - show which requirements are not satisfied (except for entity type)
 - Protocol
-  - specifies steps to go through for task
+  - specify steps to go through for task
 - Task
-  - application of a Protocol to a workset
+  - application of a Protocol to a workset (or to all samples from a workset?)
   - optionally involves an Instrument? aux_unit?
   - status: defined, started, finished, aborted
 - Sample

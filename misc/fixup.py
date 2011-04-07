@@ -9,6 +9,26 @@ Per Kraulis
 from slog import configuration, utils
 
 
+def change_altname_to_customername(doc):
+    "By popular request, change back to more explicit 'customername'."
+    if doc.get('entity') != 'sample': return
+    try:
+        altname = doc.pop('altname')
+    except KeyError:
+        return
+    doc['customername'] = altname
+    return doc
+
+def change_altname_to_runname(doc):
+    "By popular request, change back to more explicit 'runname'."
+    if doc.get('entity') != 'task': return
+    try:
+        altname = doc.pop('altname')
+    except KeyError:
+        return
+    doc['runname'] = altname
+    return doc
+
 def reinit_sample_status(doc):
     "Remove status entry for all sample documents."
     if doc.get('entity') != 'sample': return
@@ -184,5 +204,7 @@ def for_all_documents(modify):
     
 
 if __name__ == '__main__':
-    for id, rev in for_all_documents(reinit_sample_status):
+    for id, rev in for_all_documents(change_altname_to_runname):
+        print id, rev
+    for id, rev in for_all_documents(change_altname_to_customername):
         print id, rev

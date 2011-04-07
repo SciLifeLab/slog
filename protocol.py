@@ -65,6 +65,7 @@ and instruments."""
                                 fixed=True,
                                 description='Unique protocol identifier.'
                                 ' Cannot be changed once set.'),
+              TextField('description'),
               StepsDefinitionField('steps',
                                    required=True,
                                    description='The steps that the task and'
@@ -77,8 +78,7 @@ and instruments."""
               ReferenceListField('instruments',
                                  referred='instrument',
                                  description='Instruments for which this'
-                                 ' protocol is relevant.'),
-              TextField('description')]
+                                 ' protocol is relevant.')]
 
     def get_editable_privilege(self, user):
         """Is the given user allowed to edit this page?

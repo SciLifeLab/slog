@@ -29,17 +29,19 @@ class Task(Entity):
     """A task is an application of a protocol to a sample workset.
 The protocol determines the sequence of steps through which the samples
 are to be taken. A task is the same as an instrument run if an instrument
-is involved."""
+is involved.
+"""
 
     fields = [TaskNameField('name',
                             required=True,
                             fixed=True,
                             description='Unique task identifier.'
                             ' Cannot be changed once set.'),
-              StringField('altname',
+              StringField('runname',
                           required=False,
-                          description='Alternative name, such as an'
-                          ' instrument run name.'),
+                          description='Instrument run name, or other'
+                          ' alternative name for the task.'
+                          ' Note: not required to be unique.'),
               ReferenceField('protocol', 'protocol',
                              required=True,
                              fixed=True,
@@ -52,6 +54,13 @@ is involved."""
                              description='The sample workset to which'
                              ' the protocol will be applied.'
                              ' Cannot be changed once set.'),
+              TextField('description'),
+              ReferenceField('operator',
+                             referred='account',
+                             required=True,
+                             default=utils.get_login_account,
+                             description='The user responsible for'
+                             ' executing this task.'),
               ReferenceField('instrument', 'instrument',
                              required=False,
                              description='The instrument used, if any.'),
@@ -59,14 +68,7 @@ is involved."""
                           required=False,
                           description='Auxiliary instrument unit used, if any.'
                           ' This is an identifier for a flowcell, array,'
-                          ' or other essential unit.'),
-              ReferenceField('operator',
-                             referred='account',
-                             required=True,
-                             default=utils.get_login_account,
-                             description='The user responsible for'
-                             ' executing this task.'),
-              TextField('description')]
+                          ' or other essential unit.')]
 
     tool_classes = [illumina_samplesheet.Tool]
 
@@ -125,7 +127,7 @@ class Tasks(Dispatcher):
         tasks.sort(lambda i, j: cmp(i['name'], i['name']))
 
         rows = [TR(TH('Task'),
-                   TH('Altname'),
+                   TH('Runname'),
                    TH('Protocol'),
                    TH('Instrument'),
                    TH('Operator'),
@@ -144,7 +146,7 @@ class Tasks(Dispatcher):
                 url = configuration.get_url('account', operator)
                 operator = A(operator, href=url)
             rows.append(TR(TD(task),
-                           TD(doc.get('altname') or ''),
+                           TD(doc.get('runname') or ''),
                            TD(protocol),
                            TD(instrument),
                            TD(operator),

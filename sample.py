@@ -33,14 +33,16 @@ It may be a member of any number of worksets."""
                               fixed=True,
                               description='Unique sample identifier.'
                               ' Cannot be changed once set.'),
-              StringField('altname',
+              StringField('customername',
                           required=False,
-                          description="Alternative name, such as"
-                          " customer's name for sample."),
+                          description="The customer's name for the sample,"
+                          " or other alternative name."
+                          " Note: not required to be unique."),
               ReferenceField('project',
                              referred='project',
                              required=True,
                              description='Project for the sample.'),
+              TextField('description'),
               StringField('reference',
                           required=False,
                           description='Reference genome or species'
@@ -75,14 +77,12 @@ It may be a member of any number of worksets."""
                           description='Status flags for the sample.'),
               StringField('multiplex_label',
                           description="Label representing the multiplexing"
-                          " sequence. Used to defined the 'multiplex_sequence'"
-                          " value from the lookup table defined for the"
-                          " instrument used in an instrument run."),
+                          " sequence. A plugin may be used to determine the"
+                          " value of the 'multiplex_sequence' from this."),
               StringField('multiplex_sequence',
                           description='Actual multiplexing sequence.'
                           " If this is defined, then the 'multiplex_label'"
-                          " value will be ignored."),
-              TextField('description')]
+                          " value will be ignored.")]
 
     def get_viewable(self, user):
         "If role 'customer', then allow view only of own sample."
@@ -181,14 +181,14 @@ class SampleCreate(EntityCreate):
         reference = self.project.get('reference') or ''
         rows = [TR(TH(),
                    TH('Lab name (required)'),
-                   TH('Altname'),
+                   TH('Customername'),
                    TH('Reference'),
                    TH('Amount'),
                    TH('Concentration'))]
         for slot in xrange(number):
             rows.append(TR(TD(str(slot+1)),
                            TD(INPUT(type='text', name="name_%i" % slot)),
-                           TD(INPUT(type='text', name="altname_%i" %slot)),
+                           TD(INPUT(type='text', name="customername_%i" %slot)),
                            TD(INPUT(type='text',
                                     name="reference_%i" % slot,
                                     value=reference)),
@@ -228,7 +228,7 @@ class SampleCreate(EntityCreate):
                                        timestamp=utils.now_iso())],
                           timestamp=utils.now_iso())
             for key, converter in [('name', str),
-                                   ('altname', str),
+                                   ('customername', str),
                                    ('reference', str),
                                    ('amount', float),
                                    ('concentration', float)]:
@@ -283,7 +283,7 @@ class Samples(Dispatcher):
 
         rows = [TR(TH('Project'),
                    TH('Sample'),
-                   TH('Altname'),
+                   TH('Customername'),
                    TH('Status'))]
         status_field = Sample.get_field('status')
         for project in projects:
@@ -301,7 +301,7 @@ class Samples(Dispatcher):
                         cells = []
                     url = configuration.get_entity_url(sample)
                     cells.append(TD(A(sample['name'], href=url)))
-                    cells.append(TD(sample.get('altname') or ''))
+                    cells.append(TD(sample.get('customername') or ''))
                     cells.append(TD(status_field.get_view_doc(sample)))
                     rows.append(TR(*cells))
             else:

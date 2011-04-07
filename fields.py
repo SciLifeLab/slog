@@ -638,7 +638,7 @@ class SampleSetField(Field):
         samples = entity.doc.get(self.name)
         if not samples: return ''
         rows = [TR(TH('Sample'),
-                   TH('Altname'),
+                   TH('Customername'),
                    TH('Status'),
                    TH('Grid'),
                    TH('Multiplex label (sequence)'))]
@@ -658,7 +658,7 @@ class SampleSetField(Field):
             if coordinate:
                 coordinate = utils.grid_coordinate(*coordinate)
             rows.append(TR(TD(A(sample, href=url)),
-                           TD(doc.get('altname') or ''),
+                           TD(doc.get('customername') or ''),
                            TD(status_field.get_view_doc(doc)),
                            TD(coordinate),
                            TD(multiplex)))
@@ -673,7 +673,7 @@ class SampleSetField(Field):
             remove = ''
         else:
             rows = [TR(TH('Sample', colspan=2),
-                       TH('Altname'),
+                       TH('Customername'),
                        TH('Status'),
                        TH('Grid'),
                        TH('Multiplex'))]
@@ -697,7 +697,7 @@ class SampleSetField(Field):
                                         name="%s_remove" % self.name,
                                         value=sample)),
                                TD(sample),
-                               TD(doc.get('altname') or ''),
+                               TD(doc.get('customername') or ''),
                                TD(status_field.get_view_doc(doc)),
                                TD(coordinate),
                                TD(' = '.join(multiplex))))
@@ -913,28 +913,19 @@ class SampleGridField(Field):
         return self.check_value(dispatcher, result)
 
     def check_value(self, dispatcher, value):
-        """Remove duplicate placings of sample in arrangement.
-        Optionally resize the grid if the dimensions have changed."""
+        """Resize the grid if the dimensions have changed, which may
+        exclude some samples from the arrangement.
+        Note that samples may be present in more than one place in
+        the arrangement."""
         current = dispatcher.doc.get(self.name) or dict()
         current_rows = current.get('rows')
         current_columns = current.get('columns')
         current_multiplex = current.get('multiplex')
         arrangement = value.get('arrangement')
-        # Remove duplicate placings of sample in arrangement
-        if arrangement:
-            seen = set()
-            for i, row in enumerate(arrangement):
-                for j, column in enumerate(row):
-                    for k, sample in enumerate(column):
-                        if sample is None: continue
-                        if sample in seen:
-                            column[k] = None
-                        else:
-                            seen.add(sample)
+        # Remove arrangement if any dimension us undefined
         new_rows = value.get('rows')
         new_columns = value.get('columns')
         new_multiplex = value.get('multiplex')
-        # Remove arrangement if any dimension us undefined
         if (new_rows is None) or \
            (new_columns is None) or \
            (new_multiplex is None):
@@ -971,123 +962,4 @@ class SampleGridField(Field):
                 pass
         else:
             value['arrangement'] = arrangement
-        return value
-
-
-class SampleLayoutField(Field):
-    "Field containing the layout of a set of samples."
-
-    def get_array(self, entity):
-        """Get the array of samples, or the default.
-        NOTE: The array has to be rectangular!"""
-        try:
-            samples = entity.doc[self.name]
-            if not samples: raise KeyError
-            array = samples.get('array')
-        except (KeyError, AttributeError):
-            array = None
-        if not array:
-            array = [[[None]]]
-        return array
-
-    def get_view(self, entity):
-        rows = []
-        for row in self.get_array(entity):
-            cells = []
-            for cell in row:
-                parts = []
-                for sample in cell:
-                    if sample is None:
-                        sample = '-'
-                    else:
-                        sample = A(sample,
-                                   href=configuration.get_url('sample',sample))
-                    parts.append(TR(TD(sample)))
-                cells.append(TD(TABLE(*parts)))
-            rows.append(TR(*cells))
-        return TABLE(border=1, *rows)
-
-    def get_edit_form_field(self, entity):
-        array = self.get_array(entity)
-        multiplex = len(array[0][0])
-        cells = [TD(INPUT(type='hidden', name='rows', value=len(array)),
-                    INPUT(type='hidden', name='columns', value=len(array[0])),
-                    INPUT(type='hidden', name='multiplex', value=multiplex))]
-        cells.extend([TH("Column %i" % (c+1)) for c in xrange(len(array[0]))])
-        rows = [TR(*cells)]
-        for r, row in enumerate(array):
-            cells = [TH("Row %i" % (r+1))]
-            for c, samples in enumerate(row):
-                key = "%s_%i_%i" % (self.name, r+1, c+1)
-                cells.append(TD(TABLE(
-                    TR(TH("Samples (%i)" % multiplex)),
-                    TR(TD(TEXTAREA(',\n'.join([s for s in samples
-                                               if s is not None]),
-                                   name=key, cols=8, rows=min(4, multiplex)))),
-                    TR(TD('Workset',
-                          INPUT(type='text', size=8, maxlength=255,
-                                name=key+'_workset'))))))
-            rows.append(TR(*cells))
-        return TABLE(border=1, *rows)
-
-    def get_create_form_field(self, dispatcher):
-        return I('Determined by choice of instrument.')
-
-    def get_value(self, dispatcher, request, required=False):
-        array = self.get_array(dispatcher)
-        try:
-            rows = int(request.cgi_fields['rows'].value.strip())
-            if rows <= 0: raise ValueError
-        except TypeError, msg:
-            raise ValueError(msg)
-        if len(array) != rows:
-            raise ValueError('wrong number of rows in sample array layout')
-        try:
-            columns = int(request.cgi_fields['columns'].value.strip())
-            if columns <= 0: raise ValueError
-        except TypeError, msg:
-            raise ValueError(msg)
-        if len(array[0]) != columns:
-            raise ValueError('wrong number of columns in sample array layout')
-        try:
-            multiplex = int(request.cgi_fields['multiplex'].value.strip())
-            if multiplex <= 0: raise ValueError
-        except TypeError, msg:
-            raise ValueError(msg)
-        if len(array[0][0]) != multiplex:
-            raise ValueError('wrong number of multiplex in sample array layout')
-
-        for row in xrange(rows):
-            for column in xrange(columns):
-                samples = set()
-                key = "%s_%i_%i" % (self.name, row+1, column+1)
-                for value in request.cgi_fields.getlist(key):
-                    value = value.replace(',', ' ').strip()
-                    samples.update(value.split())
-                key += '_workset'
-                try:
-                    value = request.cgi_fields[key].value.strip()
-                    if not value: raise KeyError
-                    workset = dispatcher.get_named_document('workset', value)
-                except (KeyError, ValueError):
-                    pass
-                else:
-                    samples.update(workset['samples'])
-                view = dispatcher.db.view('sample/name')
-                samples = [s for s in samples if len(view[s])]
-                samples.sort()
-                if len(samples) < multiplex: # None-fill to multiplex length
-                    samples.extend([None] * (multiplex - len(samples)))
-                elif len(samples) > multiplex:
-                    raise ValueError("too many samples in row %s, column %s"
-                                     % (row+1, column+1))
-                array[row][column] = samples
-        value = dict(rows=rows,
-                     columns=columns,
-                     multiplex=multiplex,
-                     array=array)
-        return self.check_value(dispatcher, value)
-
-    def check_value(self, dispatcher, value):
-        "No check needed for this field, by default."
         return value

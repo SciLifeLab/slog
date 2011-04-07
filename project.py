@@ -37,12 +37,11 @@ It is set at creation and cannot be changed. It has the form
 'In_Name_year_number', where 'In' and 'Name' are the initials and surname of
 the project customer (=PI), 'year' is the two-digit year the project started,
 and 'number' is the consecutive number of the project in that year."""),
-              StringField('label',
-                          description='Descriptive one-liner, nickname.'),
               ReferenceField('customer',
                              referred='account',
                              required=True,
                              description='The PI of the project.'),
+              TextField('description'),
               ReferenceField('operator',
                              referred='account',
                              required=True,
@@ -72,8 +71,7 @@ and 'number' is the consecutive number of the project in that year."""),
                                     dict(name='finished',
                                          values=['yes'],
                                          description='No more work to be done.')],
-                          description='Status flags for the project.'),
-              TextField('description')]
+                          description='Status flags for the project.')]
 
     def get_viewable(self, user):
         """Everyone except customer may view any project.
@@ -109,7 +107,7 @@ and 'number' is the consecutive number of the project in that year."""),
                                action=configuration.get_url('sample'))))
 
         rows = [TR(TH('Name'),
-                   TH('Altname'),
+                   TH('Customername'),
                    TH('Amount'),
                    TH('Concentration'),
                    TH('Status'),
@@ -123,7 +121,7 @@ and 'number' is the consecutive number of the project in that year."""),
             rows.append(TR(TD(A(result.value,
                                 href=configuration.get_url('sample',
                                                            result.value))),
-                           TD(doc.get('altname', '')),
+                           TD(doc.get('customername', '')),
                            TD(doc.get('amount', '')),
                            TD(doc.get('concentration', '')),
                            TD(status_field.get_view_doc(doc)),

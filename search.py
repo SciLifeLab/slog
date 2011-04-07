@@ -55,8 +55,12 @@ class Search(Dispatcher):
                 view = self.db.view("%s/operator" % entity)
                 for row in view[key : "%sZZZZZZ" % key]:
                     result.add((entity, row.value))
-            # Search 'altname' in Sample entities
-            view = self.db.view("sample/altname")
+            # Search 'customername' in Sample entities
+            view = self.db.view("sample/customername")
+            for row in view[key : "%sZZZZZZ" % key]:
+                result.add((entity, row.key))
+            # Search 'runname' in Task entities
+            view = self.db.view("task/runname")
             for row in view[key : "%sZZZZZZ" % key]:
                 result.add((entity, row.key))
         rows = []

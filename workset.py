@@ -26,13 +26,15 @@ class WorksetNameField(NameField):
 
 
 class Workset(Entity):
-    """A set of samples to be collectively subjected to some operation,
-such as a task. The set has the following properties:
+    """A collection of samples to be collectively handled, for example to
+be processed by a task.
+It may contain samples from different projects.
+A workset has the following properties:
 
 * Dynamic: Samples may be added or removed.
 * Non-exclusive: A sample may be part of any number of worksets.
-* Arranged: The samples may be placed in a rectangular grid consisting
-  of rows, columns and multiplex.
+* Arranged: The samples may optionally be placed in a rectangular grid
+  consisting of rows, columns and multiplex.
 
 """
 
@@ -41,6 +43,7 @@ such as a task. The set has the following properties:
                         fixed=True,
                         description='Unique workset identifier.'
                         ' Cannot be changed once set.'),
+              TextField('description'),
               ReferenceField('operator',
                              referred='account',
                              required=True,
@@ -57,8 +60,7 @@ such as a task. The set has the following properties:
                               ' All dimension sizes must be positive integers'
                               ' for the grid to be defined. Shrinking the'
                               ' dimension sizes may implicitly remove some'
-                              ' samples from the arrangement.'),
-              TextField('description')]
+                              ' samples from the arrangement.')]
 
     def get_editable_privilege(self, user):
         "Everyone except customer may edit any project."

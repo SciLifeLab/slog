@@ -68,7 +68,7 @@ class BaseTool(object):
 
     @property
     def modulename(self):
-        "Must return the filename of the module."
+        "Must return the filename of the tool module."
         raise NotImplementedError
 
     def get_entity_tag(self, doc):
@@ -88,7 +88,7 @@ class BaseTool(object):
         raise NotImplementedError
 
     def do_operation(self, dispatcher, request):
-        """Perform the operation.
+        """Perform the tool operation.
         Save the document to the database.
         Return the comment for the log entry."""
         raise NotImplementedError
