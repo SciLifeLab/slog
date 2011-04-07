@@ -9,7 +9,7 @@ Current version
 - Application: get rid of this entity? Instead: List of tasks (with protocol)
   for a project, to be created by manager.
 
-- Features
+- Fix features
   - Results: allow adding paths, links to result files/directories
   - Driver's license: account has associated protocols 'licensed'
   - project report: all that has happened
@@ -20,7 +20,6 @@ Current version
 - Unit tests
 
 - Interface
-  - Description field higher up in display
   - Smaller font for field descriptions? (ReST option?)
   - Immediate-response option selection for "operator" in several list views.
   - Current sample arrangement in workset is hard to understand;

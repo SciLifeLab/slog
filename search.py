@@ -58,11 +58,11 @@ class Search(Dispatcher):
             # Search 'customername' in Sample entities
             view = self.db.view("sample/customername")
             for row in view[key : "%sZZZZZZ" % key]:
-                result.add((entity, row.key))
+                result.add(('sample', row.value))
             # Search 'runname' in Task entities
             view = self.db.view("task/runname")
             for row in view[key : "%sZZZZZZ" % key]:
-                result.add((entity, row.key))
+                result.add(('task', row.value))
         rows = []
         for entity, name in sorted(result):
             url = configuration.get_url(entity, name)
