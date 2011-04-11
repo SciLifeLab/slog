@@ -9,6 +9,20 @@ Per Kraulis
 from slog import configuration, utils
 
 
+def put_application_into_description(doc):
+    "Following removal of Application entity, move ref into description."
+    application = doc.get('application')
+    if not application: return
+    application = application.replace('_', ' ')
+    application = "Application: %s" % application
+    description = doc.get('description')
+    if description:
+        description += '\n' + application
+    else:
+        description = application
+    doc['description'] = description
+    return doc
+
 def change_altname_to_customername(doc):
     "By popular request, change back to more explicit 'customername'."
     if doc.get('entity') != 'sample': return
@@ -204,7 +218,5 @@ def for_all_documents(modify):
     
 
 if __name__ == '__main__':
-    for id, rev in for_all_documents(change_altname_to_runname):
-        print id, rev
-    for id, rev in for_all_documents(change_altname_to_customername):
+    for id, rev in for_all_documents(put_application_into_description):
         print id, rev

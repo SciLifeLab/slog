@@ -12,7 +12,6 @@ from account import Account
 from project import Project
 from sample import Sample
 from workset import Workset
-from application import Application
 from protocol import Protocol
 from task import Task
 from instrument import Instrument
@@ -37,7 +36,6 @@ the change."""))
                       Project,
                       Sample,
                       Workset,
-                      Application,
                       Protocol,
                       Task,
                       Instrument]:

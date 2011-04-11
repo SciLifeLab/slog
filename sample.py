@@ -25,8 +25,9 @@ class SampleNameField(NameField):
 
 class Sample(Entity):
     """A sample is a finite amount of material to be analysed.
-It is always part of one and only one project.
-It may be a member of any number of worksets."""
+It is always part of one and only one project. It may have a parent sample
+from which it was derived by some operation, such as replating or aliquoting.
+A sample may be a member of any number of worksets."""
 
     fields = [SampleNameField('name',
                               required=True,

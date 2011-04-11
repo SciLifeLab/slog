@@ -56,9 +56,7 @@ class StepsDefinitionField(Field):
 
 class Protocol(Entity):
     """A protocol is a template for a task. It specifies the steps that
-the samples in the workset of a task are to be taken through.
-The protocol may be associated with any number of applications
-and instruments."""
+the samples in the workset of a task are to be taken through."""
 
     fields = [ProtocolNameField('name',
                                 required=True,
@@ -70,15 +68,7 @@ and instruments."""
                                    required=True,
                                    description='The steps that the task and'
                                    ' the samples in its workset are to be'
-                                   ' taken through.'),
-              ReferenceListField('applications',
-                                 referred='application',
-                                 description='Applications for which this'
-                                 ' protocol is relevant.'),
-              ReferenceListField('instruments',
-                                 referred='instrument',
-                                 description='Instruments for which this'
-                                 ' protocol is relevant.')]
+                                   ' taken through.')]
 
     def get_editable_privilege(self, user):
         """Is the given user allowed to edit this page?

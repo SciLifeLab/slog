@@ -70,7 +70,7 @@ describing the layout of the samples in one run."""
         self.view_xrefs(page)
 
     def view_protocols(self, page):
-        "Show list of protocols for application."
+        "Show list of protocols for instrument."
         page.append(H2("Protocols"))
 
         rows = [TR(TH('Protocol'),

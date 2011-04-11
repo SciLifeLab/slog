@@ -37,7 +37,7 @@ class Search(Dispatcher):
                            'project',
                            'sample',
                            'workset',
-                           'application',
+                           ## 'application',
                            'protocol',
                            'task',
                            'instrument']:

@@ -112,6 +112,13 @@ class Field(object):
             raise ValueError("Value for '%s' must be non-null." % self.name)
         return value
 
+    def value_to_string(self, value):
+        "Convert the value to string for the edit form field."
+        if value is None:
+            return ''
+        else:
+            return str(value)
+
 
 class StringField(Field):
     "Field for a one-line text string."
@@ -139,13 +146,6 @@ class StringField(Field):
                 value = self.default
         return INPUT(type='text', name=self.name, value=value,
                      size=self.size, maxlength=self.maxlength)
-
-    def value_to_string(self, value):
-        "Convert the value to string for the edit form field."
-        if value is None:
-            return ''
-        else:
-            return str(value)
 
 
 class TextField(Field):

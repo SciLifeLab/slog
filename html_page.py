@@ -73,7 +73,6 @@ class HtmlPage(object):
                          'Projects',
                          'Samples',
                          'Worksets',
-                         'Applications',
                          'Protocols',
                          'Tasks',
                          'Instruments']:

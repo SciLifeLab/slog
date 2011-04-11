@@ -24,8 +24,8 @@ class ProjectNameField(NameField):
 
 
 class Project(Entity):
-    """A project consists of a set of samples to be analysed using a specific
-application. The samples belong to this and only this project.
+    """A project consists of a set of samples to be analysed using a particular
+experimental strategy. The samples belong to this and only this project.
 The customer is usually the Principal Investigator (PI) of the project."""
 
     fields = [ProjectNameField('name',
@@ -37,21 +37,17 @@ It is set at creation and cannot be changed. It has the form
 'In_Name_year_number', where 'In' and 'Name' are the initials and surname of
 the project customer (=PI), 'year' is the two-digit year the project started,
 and 'number' is the consecutive number of the project in that year."""),
+              TextField('description'),
               ReferenceField('customer',
                              referred='account',
                              required=True,
                              description='The PI of the project.'),
-              TextField('description'),
               ReferenceField('operator',
                              referred='account',
                              required=True,
                              default=utils.get_login_account,
                              description='The user responsible for'
                              ' overseeing this project.'),
-              ReferenceField('application',
-                             referred='application',
-                             required=True,
-                             description="Experimental strategy."),
               StringField('reference',
                           required=False,
                           description='Reference for the project,'
@@ -165,7 +161,6 @@ class Projects(Dispatcher):
         rows = [TR(TH('Project'),
                    TH('Label'),
                    TH('Customer'),
-                   TH('Application'),
                    TH('Status'),
                    TH('# Samples'),
                    TH('Timestamp'))]
@@ -182,15 +177,9 @@ class Projects(Dispatcher):
             if customer:
                 customer = A(customer,
                              href=configuration.get_url('account', customer))
-            # Defensive programming: in reality always defined
-            application = doc.get('application')
-            if application:
-                url = configuration.get_url('application', application)
-                application = A(application, href=url)
             rows.append(TR(TD(project),
                            TD(result.value or ''),
                            TD(customer),
-                           TD(application),
                            TD(status_field.get_view_doc(doc)),
                            TD(str(counts.get(doc['name'], 0))),
                            TD(result.key)))

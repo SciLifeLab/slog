@@ -4,10 +4,21 @@ To do
 Current version
 ---------------
 
-- Change name of 'tool' to 'plugin'? Or other name?
+- Remove Application entity:
+  - Remove 'application' index documents.
+  - Remove 'application' field in Project entities, include its content into
+    'description' field.
+  - Remove fields 'applications' and 'instruments' from Protocol entities.
+  - 
+- List of tasks (with protocol) for a project, created by manager.
+- Protocol definition: steps, with possible values.
+- Task as application of a Protocol to a workset of samples.
+  - current step
+  - when stepping forward, leave non-OK behind?
 
-- Application: get rid of this entity? Instead: List of tasks (with protocol)
-  for a project, to be created by manager.
+- Comment for field change: get rid of? separate git branch?
+
+- Change name of 'tool' to 'plugin'? Or other name?
 
 - Fix features
   - Results: allow adding paths, links to result files/directories
