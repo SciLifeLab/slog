@@ -9,10 +9,20 @@ Per Kraulis
 from slog import configuration, utils
 
 
+def remove_status(doc):
+    "Remove the 'status' field."
+    try:
+        doc.pop('status')
+    except KeyError:
+        pass
+    else:
+        return doc
+
 def put_application_into_description(doc):
     "Following removal of Application entity, move ref into description."
     application = doc.get('application')
     if not application: return
+    doc.pop('application')
     application = application.replace('_', ' ')
     application = "Application: %s" % application
     description = doc.get('description')
@@ -218,5 +228,5 @@ def for_all_documents(modify):
     
 
 if __name__ == '__main__':
-    for id, rev in for_all_documents(put_application_into_description):
+    for id, rev in for_all_documents(remove_status):
         print id, rev

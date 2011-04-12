@@ -63,7 +63,7 @@ the samples in the workset of a task are to be taken through."""
                                 fixed=True,
                                 description='Unique protocol identifier.'
                                 ' Cannot be changed once set.'),
-              TextField('description'),
+              TextField('description', description='Explanation, comments.'),
               StepsDefinitionField('steps',
                                    required=True,
                                    description='The steps that the task and'

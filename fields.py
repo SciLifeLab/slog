@@ -67,10 +67,6 @@ class Field(object):
                TD(self.get_edit_form_field(entity)),
                TD(I(self.required and 'required' or 'optional')),
                TD(self.get_description())),
-            TR(TH('comment'),           # Log entry comment
-               TD(TEXTAREA(name='_comment', cols=60, rows=3)),
-               TD(I('optional')),
-               TD('Describe the reason for the change.')),
             TR(TD(),
                TD(INPUT(type='submit', value='Save'),
                   INPUT(type='hidden', name='_rev', value=entity.doc.rev)))),
@@ -80,6 +76,13 @@ class Field(object):
     def get_edit_form_field(self, entity):
         "Return the HTML element for editing the current value."
         raise NotImplementedError
+
+    def value_to_string(self, value):
+        "Convert the value to string for the edit form field."
+        if value is None:
+            return ''
+        else:
+            return str(value)
 
     def get_create_form_field(self, dispatcher):
         "Return the HTML element for creating the value for a new entity."
@@ -111,13 +114,6 @@ class Field(object):
         if value is None and self.required:
             raise ValueError("Value for '%s' must be non-null." % self.name)
         return value
-
-    def value_to_string(self, value):
-        "Convert the value to string for the edit form field."
-        if value is None:
-            return ''
-        else:
-            return str(value)
 
 
 class StringField(Field):
@@ -177,10 +173,9 @@ class TextField(Field):
     def check_value(self, dispatcher, value):
         "Convert to sensible newlines."
         value = super(TextField, self).check_value(dispatcher, value)
-        if value is None:
-            return None
-        else:
-            return value.replace('\r\n', '\n')
+        if value is None: return None
+        return value.replace('\r\n', '\n')
+
 
 class FloatField(StringField):
     "Field to represent a floating point value."
@@ -194,9 +189,10 @@ class FloatField(StringField):
 
     def check_value(self, dispatcher, value):
         value = super(FloatField, self).check_value(dispatcher, value)
+        if value is None: return None
         try:
             return float(value)
-        except (ValueError, TypeError):
+        except ValueError:
             raise ValueError("Value for '%s' is not a float." % self.name)
 
 
@@ -212,9 +208,10 @@ class IntegerField(StringField):
 
     def check_value(self, dispatcher, value):
         value = super(IntegerField, self).check_value(dispatcher, value)
+        if value is None: return None
         try:
             return int(value)
-        except (ValueError, TypeError):
+        except ValueError:
             raise ValueError("Value for '%s' is not an integer." % self.name)
 
 
@@ -223,13 +220,54 @@ class PositiveIntegerField(IntegerField):
 
     def check_value(self, dispatcher, value):
         value = super(PositiveIntegerField, self).check_value(dispatcher, value)
+        if value is None: return None
         try:
             value = int(value)
             if value <= 0: raise ValueError
-        except (ValueError, TypeError):
+        except ValueError:
             raise ValueError("Value for '%s' is not a positive integer."
                              % self.name)
         return value
+
+
+class BooleanField(Field):
+    "Field to represent a boolean value, e.g. 'true' or 'false'."
+
+    def get_edit_form_field(self, entity):
+        try:
+            value = entity.doc.get(self.name)
+        except AttributeError:          # '.doc' not set when creating
+            value = None
+        rows = []
+        attrs = dict(type='radio', name=self.name)
+        if not self.required:
+            attrs['value'] = '__none__'
+            if value is None: attrs['checked'] = True
+            rows.append(TR(TD(INPUT(**attrs), B('Undefined'))))
+        attrs['value'] = 'false'
+        if value == False:
+            attrs['checked'] = True
+        else:
+            attrs.pop('checked', None)
+        rows.append(TR(TD(INPUT(**attrs), B('False'))))
+        attrs['value'] = 'true'
+        if value == True:
+            attrs['checked'] = True
+        else:
+            attrs.pop('checked', None)
+        rows.append(TR(TD(INPUT(**attrs), B('True'))))
+        return TABLE(*rows)
+
+    def check_value(self, dispatcher, value):
+        value = super(BooleanField, self).check_value(dispatcher, value)
+        if value is None: return None
+        value = value.lower()
+        if value in ('true', 'on', 'yes'):
+            return True
+        elif value in ('false', 'off', 'no'):
+            return False
+        else:
+            raise ValueError("Value for '%s' is not a boolean." % self.name)
 
 
 class TimestampField(StringField):
@@ -294,21 +332,21 @@ class NameField(StringField):
         In particular, no blank may be present.
         It must be unique for its entity type."""
         value = super(NameField, self).check_value(dispatcher, value)
-        if value:
-            if not configuration.VALID_NAME_RX.match(value):
-                raise ValueError("Value '%s' for '%s' is not a valid name"
-                                 % (value, self.name))
-            try:
-                current = dispatcher.doc.get(self.name)
-            except AttributeError:      # No 'doc' in dispatcher when creating
-                pass
-            else:
-                if value != current:
-                    entity = dispatcher.__class__.__name__.lower()
-                    view = dispatcher.db.view("%s/name" % entity)
-                    if view[value]:
-                        raise ValueError("Value '%s' for '%s' is not unique."
-                                         % (value, self.name))
+        if value is None: return value
+        if not configuration.VALID_NAME_RX.match(value):
+            raise ValueError("Value '%s' for '%s' is not a valid name"
+                             % (value, self.name))
+        try:
+            current = dispatcher.doc.get(self.name)
+        except AttributeError:      # No 'doc' in dispatcher when creating
+            pass
+        else:
+            if value != current:
+                entity = dispatcher.__class__.__name__.lower()
+                view = dispatcher.db.view("%s/name" % entity)
+                if view[value]:
+                    raise ValueError("Value '%s' for '%s' is not unique."
+                                     % (value, self.name))
         return value
 
 
@@ -500,149 +538,16 @@ class ReferenceListField(ReferenceField):
         return names
 
 
-class StatusField(Field):
-    "Field for a list of statuses with their associated timestamps and values."
-
-    def __init__(self, name, statuses=[], description=None):
-        """'statuses' is a list of dictionaries having a number of items:
-        'name' (required): the name of the status subfield.
-        'values' (optional): a sequence of possible values.
-        'description' (optional): textual description of the status.
-        """
-        super(StatusField, self).__init__(name,
-                                          required=True,
-                                          description=description)
-        # Set the 'statuses' member; check definition
-        self.statuses = []
-        names = set()
-        for status in statuses:
-            name = status['name']       # Must be dict, and have item 'name'
-            assert name not in names, "status '%s' already defined" % name
-            names.add(name)
-            self.statuses.append(status.copy())
-
-    def get_view(self, entity, full=True):
-        return self.get_view_doc(entity.doc, full=full)
-
-    def get_view_doc(self, doc, full=False):
-        statuses = dict()                              # Actual subfields
-        for status in doc.get(self.name, []):
-            statuses[status['name']] = status.copy()
-        rows = []
-        # Predefined status items
-        for status in self.statuses:                   # Possible subfields
-            name = status['name']
-            cells = [TH(name)]
-            try:
-                actual = statuses.pop(name)            # Remove processed item
-            except KeyError:
-                if not full: continue   # Do not display row
-                cells.append(TD())
-                cells.append(TD('-'))
-            else:
-                cells.append(TD(actual.get('timestamp', '')))
-                cells.append(TD(actual.get('value', '-')))
-            if full:
-                cells.append(TD(status.get('description', '')))
-            rows.append(TR(*cells))
-        # Remaining actual status values
-        names = statuses.keys()
-        names.sort()                    # XXX other sort criterion?
-        for name in names:
-            cells = [TH(name)]
-            try:
-                actual = statuses.pop(name)            # Remove processed item
-            except KeyError:
-                if not full: continue
-                cells.append(TD())
-                cells.append(TD('-'))
-            else:
-                cells.append(TD(actual.get('timestamp', '')))
-                cells.append(TD(actual.get('value', '-')))
-            rows.append(TR(*cells))
-        return TABLE(*rows)
-
-    def get_edit_form_field(self, entity):
-        statuses = dict()                                  # Actual subfields
-        for status in entity.doc.get(self.name, []):
-            statuses[status['name']] = status
-        rows = []
-        for status in self.statuses:                       # Possible subfields
-            name = status['name']
-            try:
-                timestamp = statuses[name].get('timestamp', '')
-                value = statuses[name].get('value', '')
-            except KeyError:
-                timestamp = ''
-                value = ''
-            input_name = "%s_%s" % (self.name, name)
-            try:
-                values = status['values']
-            except KeyError:            # No predefined values
-                item = INPUT(type='text', name=input_name, value=value)
-            else:                       # Predefined values
-                if value:
-                    options = [OPTION('', value='__none__')]
-                else:
-                    options = [OPTION('', value='__none__', selected=True)]
-                for opt in status.get('values', []):
-                    if opt == value:
-                        options.append(OPTION(opt, selected=True))
-                    else:
-                        options.append(OPTION(opt))
-                item = SELECT(name=input_name, *options)
-            rows.append(TR(TH(name),
-                           TD(item),
-                           TD(status.get('description', ''))))
-        return FORM(TABLE(*rows),
-                    method='POST',
-                    action=entity.get_url())
-
-    def get_value(self, dispatcher, request, required=False):
-        statuses = dict()                              # Actual subfields
-        for status in dispatcher.doc.get(self.name, []):
-            statuses[status['name']] = status
-        orig_statuses = statuses.copy()
-        for status in self.statuses:                   # Possible subfields
-            name = status['name']
-            input_name = "%s_%s" % (self.name, name)
-            try:
-                value = request.cgi_fields[input_name].value.strip()
-                if not value: raise KeyError
-            except KeyError:
-                pass
-            else:
-                if value == '__none__':
-                    try:
-                        del statuses[name]
-                    except KeyError:
-                        pass
-                else:
-                    statuses[name] = dict(name=name,
-                                          timestamp=utils.now_iso(),
-                                          value=value)
-        if statuses == orig_statuses:
-            raise KeyError("Status '%s' not changed" % self.name)
-        return self.check_value(dispatcher, statuses.values())
-
-    def check_value(self, dispatcher, value):
-        "No check needed for this field, by default."
-        return value
-
-
 class SampleSetField(Field):
-    "Set of sample references."
+    "Set of sample references; for Workset."
 
     def get_view(self, entity):
-        from .sample import Sample
         samples = entity.doc.get(self.name)
         if not samples: return ''
         rows = [TR(TH('Sample'),
                    TH('Customername'),
-                   TH('Status'),
                    TH('Grid'),
                    TH('Multiplex label (sequence)'))]
-        status_field = Sample.get_field('status')
         # Ugly kludge: values from another entity field, via entity method
         try:
             arranged_samples = entity.get_arranged_samples()
@@ -659,7 +564,6 @@ class SampleSetField(Field):
                 coordinate = utils.grid_coordinate(*coordinate)
             rows.append(TR(TD(A(sample, href=url)),
                            TD(doc.get('customername') or ''),
-                           TD(status_field.get_view_doc(doc)),
                            TD(coordinate),
                            TD(multiplex)))
         return TABLE(border=1, *rows)
@@ -674,10 +578,8 @@ class SampleSetField(Field):
         else:
             rows = [TR(TH('Sample', colspan=2),
                        TH('Customername'),
-                       TH('Status'),
                        TH('Grid'),
                        TH('Multiplex'))]
-            status_field = Sample.get_field('status')
             # Ugly kludge: values from another entity field, via entity method
             try:
                 arranged_samples = entity.get_arranged_samples()
@@ -698,7 +600,6 @@ class SampleSetField(Field):
                                         value=sample)),
                                TD(sample),
                                TD(doc.get('customername') or ''),
-                               TD(status_field.get_view_doc(doc)),
                                TD(coordinate),
                                TD(' = '.join(multiplex))))
             remove = TABLE(border=1, *rows)

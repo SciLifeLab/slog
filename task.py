@@ -54,7 +54,7 @@ is involved.
                              description='The sample workset to which'
                              ' the protocol will be applied.'
                              ' Cannot be changed once set.'),
-              TextField('description'),
+              TextField('description', description='Explanation, comments.'),
               ReferenceField('operator',
                              referred='account',
                              required=True,

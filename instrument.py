@@ -32,6 +32,7 @@ describing the layout of the samples in one run."""
                                   fixed=True,
                                   description='Unique instrument identifier.'
                                   ' Cannot be changed once set.'),
+              TextField('description', description='Explanation, comments.'),
               StringField('label',
                           description='Descriptive one-liner, nickname.'),
               StringField('type',
@@ -40,7 +41,7 @@ describing the layout of the samples in one run."""
               ReferenceField('operator',
                              referred='account',
                              required=False,
-                             description='The person responsible for'
+                             description='The user responsible for'
                              ' the instrument.'),
               IntegerField('max_rows',
                            required=True,
@@ -56,8 +57,7 @@ describing the layout of the samples in one run."""
                            required=True,
                            default=1,
                            description="The maximum number of samples in"
-                           " each lane/well of the instrument's sample array."),
-              TextField('description')]
+                           " each lane/well of the instrument's sample array.")]
 
     def view(self, page):
         "Produce the HTML page for GET."

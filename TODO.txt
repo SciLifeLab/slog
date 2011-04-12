@@ -4,21 +4,12 @@ To do
 Current version
 ---------------
 
-- Remove Application entity:
-  - Remove 'application' index documents.
-  - Remove 'application' field in Project entities, include its content into
-    'description' field.
-  - Remove fields 'applications' and 'instruments' from Protocol entities.
-  - 
-- List of tasks (with protocol) for a project, created by manager.
-- Protocol definition: steps, with possible values.
-- Task as application of a Protocol to a workset of samples.
-  - current step
-  - when stepping forward, leave non-OK behind?
-
-- Comment for field change: get rid of? separate git branch?
-
-- Change name of 'tool' to 'plugin'? Or other name?
+- Operation: instead of protocol/task/tool
+  - works on sample(s) via workset
+  - pushes sample(s) through series of steps
+  - record data, status
+  - preconditions: requirements before next step can be taken
+  - created/required by manager
 
 - Fix features
   - Results: allow adding paths, links to result files/directories
@@ -51,19 +42,10 @@ Current version
   - status: defined, started, finished, aborted
 - Sample
   - create subsample
-- 'Action' class (or some such name) to perform some operation
-  on an entity satisfying some criterion. Allow display of button to
-  do the action (or automatic after change?), and what is to be done.
 
-- InstrumentRun
-  - report
-    - select parts of run based on project
-    - align with data pipeline
 - Edit data for all samples in a workset simultaneously?
 - Project overview
-- Better CouchDB indexes for lists of entities;
-  all data in a list value, rather than having to use 'include_docs'.
-- Add feature 'retired' or 'archived'
+- Add field 'archived'
   - how to do indexing?
 - refactor JSON documents: references should be dicts rather than
   a simple name string, allowing use of explicit UUIDs:

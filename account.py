@@ -80,7 +80,7 @@ which determines the access privileges. The possible roles are:
                           description='Initials of the full name.'),
               TextField('address'),
               StringField('email', size=60),
-              TextField('description')]
+              TextField('description', description='Explanation, comments.')]
 
     def view(self, page):
         self.view_fields(page)

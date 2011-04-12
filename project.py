@@ -25,8 +25,7 @@ class ProjectNameField(NameField):
 
 class Project(Entity):
     """A project consists of a set of samples to be analysed using a particular
-experimental strategy. The samples belong to this and only this project.
-The customer is usually the Principal Investigator (PI) of the project."""
+experimental strategy. The samples belong to this and only this project."""
 
     fields = [ProjectNameField('name',
                                required=True,
@@ -37,16 +36,17 @@ It is set at creation and cannot be changed. It has the form
 'In_Name_year_number', where 'In' and 'Name' are the initials and surname of
 the project customer (=PI), 'year' is the two-digit year the project started,
 and 'number' is the consecutive number of the project in that year."""),
-              TextField('description'),
+              TextField('description', description='Explanation, comments.'),
               ReferenceField('customer',
                              referred='account',
                              required=True,
-                             description='The PI of the project.'),
+                             description='The customer is usually the Principal'
+                             ' Investigator (PI) of the project.'),
               ReferenceField('operator',
                              referred='account',
                              required=True,
                              default=utils.get_login_account,
-                             description='The user responsible for'
+                             description='The engineer responsible for'
                              ' overseeing this project.'),
               StringField('reference',
                           required=False,
@@ -54,30 +54,36 @@ and 'number' is the consecutive number of the project in that year."""),
                           ' e.g. species or genome.'
                           ' Samples created within the project will'
                           ' be assigned this reference by default.'),
-              StatusField('status',
-                          statuses=[dict(name='defined',
-                                         values=['yes'],
-                                         description='After customer application.'),
-                                    dict(name='approved',
-                                         values=['yes'],
-                                         description='By review committee.'),
-                                    dict(name='started',
-                                         values=['yes'],
-                                         description='All samples received.'),
-                                    dict(name='finished',
-                                         values=['yes'],
-                                         description='No more work to be done.')],
-                          description='Status flags for the project.')]
+              BooleanField('approved',
+                           required=False,
+                           description='Has been approved by the review'
+                           ' committee.'),
+              BooleanField('started',
+                           required=False,
+                           description='Go-ahead has been given for work.'),
+              BooleanField('finished',
+                           required=False,
+                           description='Work has been finalized.'),
+              BooleanField('archived',
+                           required=False,
+                           description='Samples and results are no longer'
+                           ' directly available.'),
+              StringField('results',
+                          required=False,
+                          description='Pointer to where the results can be'
+                          ' found. For example: the UPPNEX project name,'
+                          ' or the SweStore identifier.')]
 
     def get_viewable(self, user):
         """Everyone except customer may view any project.
         Customer may view his own project."""
         if user.get('role') in ('admin', 'manager', 'engineer'): return True
-        return user['name'] == self.doc['customer']
+        return user['name'] == self.doc.get('customer')
 
     def get_editable_privilege(self, user):
-        "Everyone except customer may edit any project."
-        return user.get('role') in ('admin', 'manager', 'engineer')
+        "Only the manager and the operator may edit the project."
+        if user.get('role') in ('admin', 'manager'): return True
+        return user['name'] == self.doc.get('operator')
 
     def view(self, page):
         "Produce the HTML page for GET."
@@ -106,12 +112,10 @@ and 'number' is the consecutive number of the project in that year."""),
                    TH('Customername'),
                    TH('Amount'),
                    TH('Concentration'),
-                   TH('Status'),
                    TH('Timestamp'))]
         view = self.db.view('sample/project', include_docs=True)
         results = list(view[self.doc['name']])
         results.sort(lambda i, j: cmp(i.value, j.value)) # Sort by name
-        status_field = Sample.get_field('status')
         for result in results:
             doc = result.doc
             rows.append(TR(TD(A(result.value,
@@ -120,7 +124,6 @@ and 'number' is the consecutive number of the project in that year."""),
                            TD(doc.get('customername', '')),
                            TD(doc.get('amount', '')),
                            TD(doc.get('concentration', '')),
-                           TD(status_field.get_view_doc(doc)),
                            TD(doc.get('timestamp'))))
         page.append(TABLE(border=1, *rows))
 
@@ -161,10 +164,8 @@ class Projects(Dispatcher):
         rows = [TR(TH('Project'),
                    TH('Label'),
                    TH('Customer'),
-                   TH('Status'),
                    TH('# Samples'),
                    TH('Timestamp'))]
-        status_field = Project.get_field('status')
         view = self.db.view('project/timestamp',
                             descending=True,
                             include_docs=True)
@@ -180,7 +181,6 @@ class Projects(Dispatcher):
             rows.append(TR(TD(project),
                            TD(result.value or ''),
                            TD(customer),
-                           TD(status_field.get_view_doc(doc)),
                            TD(str(counts.get(doc['name'], 0))),
                            TD(result.key)))
         page.append(TABLE(border=1, *rows))

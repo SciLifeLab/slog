@@ -43,7 +43,7 @@ A sample may be a member of any number of worksets."""
                              referred='project',
                              required=True,
                              description='Project for the sample.'),
-              TextField('description'),
+              TextField('description', description='Explanation, comments.'),
               StringField('reference',
                           required=False,
                           description='Reference genome or species'
@@ -54,28 +54,21 @@ A sample may be a member of any number of worksets."""
                              fixed=True,
                              description='Sample from which this was derived.'
                              ' Cannot be changed once set.'),
+              TimestampField('received',
+                             required=False,
+                             description='When the sample was received'
+                             ' or created.'),
+              BooleanField('available',
+                           required=False,
+                           description='Available and OK for work.'),
+              BooleanField('archived',
+                           required=False,
+                           description='No longer directly available.'),
               FloatField('amount', description='Unit: ?'),
               FloatField('concentration', description='Unit: ?'),
               StringField('location',
                           required=False,
                           description='Physical location of sample.'),
-              StatusField('status',
-                          statuses=[dict(name='defined',
-                                         values=['yes'],
-                                         description='Defined in this system.'),
-                                    dict(name='available',
-                                         values=['yes'],
-                                         description='Received or created.'),
-                                    dict(name='finished',
-                                         values=['yes'],
-                                         description='No more work to be done.'),
-                                    dict(name='returned',
-                                         value=['yes'],
-                                         description='Returned to customer.'),
-                                    dict(name='scrapped',
-                                         values=['yes'],
-                                         description='Useless for any further work.')],
-                          description='Status flags for the sample.'),
               StringField('multiplex_label',
                           description="Label representing the multiplexing"
                           " sequence. A plugin may be used to determine the"
@@ -224,9 +217,6 @@ class SampleCreate(EntityCreate):
             sample = dict(_id=utils.id_uuid(),
                           entity='sample',
                           project=self.project['name'],
-                          status=[dict(name='defined',
-                                       value='yes',
-                                       timestamp=utils.now_iso())],
                           timestamp=utils.now_iso())
             for key, converter in [('name', str),
                                    ('customername', str),
@@ -252,7 +242,7 @@ class SampleCreate(EntityCreate):
             samples.append(sample)
         for sample in samples:
             self.db.save(sample)
-            self.log(sample['_id'], 'defined')
+            self.log(sample['_id'], 'created')
         samplelist = ', '.join([s['name'] for s in samples])
         self.log(self.project.id,
                  'added samples',
@@ -284,9 +274,7 @@ class Samples(Dispatcher):
 
         rows = [TR(TH('Project'),
                    TH('Sample'),
-                   TH('Customername'),
-                   TH('Status'))]
-        status_field = Sample.get_field('status')
+                   TH('Customername'))]
         for project in projects:
             link_project = A(project,
                              href=configuration.get_url('project', project))
@@ -303,7 +291,6 @@ class Samples(Dispatcher):
                     url = configuration.get_entity_url(sample)
                     cells.append(TD(A(sample['name'], href=url)))
                     cells.append(TD(sample.get('customername') or ''))
-                    cells.append(TD(status_field.get_view_doc(sample)))
                     rows.append(TR(*cells))
             else:
                 rows.append(TR(TD(link_project)))

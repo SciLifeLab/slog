@@ -13,7 +13,6 @@ from wireframe.application import Application as WsgiApplication
 from slog.home import Home
 from slog.search import Search
 from slog.account import Account, AccountCreate, Accounts
-## from slog.application import Application, ApplicationCreate, Applications
 from slog.protocol import Protocol, ProtocolCreate, Protocols
 from slog.project import Project, ProjectCreate, Projects
 from slog.sample import Sample, SampleCreate, Samples
@@ -37,9 +36,6 @@ application.add_class(r'^/attachment/(?P<id>[a-f0-9]{32,32})/(?P<filename>[^/]+)
 application.add_class(r'^/accounts$', Accounts)
 application.add_class(r'^/account/(?P<name>[^/]+)$', Account)
 application.add_class(r'^/account/?$', AccountCreate)
-## application.add_class(r'^/applications$', Applications)
-## application.add_class(r'^/application/(?P<name>[^/]+)$', Application)
-## application.add_class(r'^/application/?$', ApplicationCreate)
 application.add_class(r'^/protocols$', Protocols)
 application.add_class(r'^/protocol/(?P<name>[^/]+)$', Protocol)
 application.add_class(r'^/protocol/?$', ProtocolCreate)

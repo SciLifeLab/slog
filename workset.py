@@ -26,9 +26,10 @@ class WorksetNameField(NameField):
 
 
 class Workset(Entity):
-    """A collection of samples to be collectively handled, for example to
-be processed by a task.
-It may contain samples from different projects.
+    """A collection of samples to be handled collectively, for example to
+be processed by an operation. It may represent a physical collection (a plate)
+or a virtual collection. It may contain samples from different projects.
+
 A workset has the following properties:
 
 * Dynamic: Samples may be added or removed.
@@ -43,7 +44,7 @@ A workset has the following properties:
                         fixed=True,
                         description='Unique workset identifier.'
                         ' Cannot be changed once set.'),
-              TextField('description'),
+              TextField('description', description='Explanation, comments.'),
               ReferenceField('operator',
                              referred='account',
                              required=True,

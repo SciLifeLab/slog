@@ -261,8 +261,6 @@ class Entity(Dispatcher):
         page.append(P(FORM(TABLE(
             TR(TH('Delete'),
                TD(TABLE(border=1, *rows))),
-            TR(TH('Comment'),
-               TD(TEXTAREA(name='comment', cols=60, rows=3))),
             TR(TD(),
                TD(INPUT(type='submit', value='Delete checked')))),
                            method='POST',
@@ -270,8 +268,6 @@ class Entity(Dispatcher):
         page.append(P(FORM(TABLE(
             TR(TH('Attach file'),
                TD(INPUT(type='file', size=40, name='_attachment'))),
-            TR(TH('Comment'),
-               TD(TEXTAREA(name='comment', cols=60, rows=3))),
             TR(TD(),
                TD(INPUT(type='submit', value='Upload')))),
                            enctype='multipart/form-data',
@@ -376,15 +372,6 @@ class Entity(Dispatcher):
         except (AttributeError, TypeError):
             initial = None
 
-        # Get user comment for the change, if any
-        try:
-            comment = request.cgi_fields['_comment'].value
-        except KeyError:
-            comment = None
-        else:
-            comment = comment.strip()
-            comment = comment.replace('\r\n', '\n')
-
         modified = []                   # Names of fields that were modified
 
         try:
@@ -423,7 +410,7 @@ class Entity(Dispatcher):
             map(self.on_field_modified, modified)
             id, rev = self.db.save(self.doc) # Create or update
             self.doc = self.db[id]           # Get fresh instance
-            self.log(self.doc.id, action, initial=initial, comment=comment)
+            self.log(self.doc.id, action, initial=initial)
 
         # Delete attachments
         stubs = self.doc.get('_attachments', dict())
@@ -432,13 +419,11 @@ class Entity(Dispatcher):
                 initial = dict(self.doc)
                 self.db.delete_attachment(self.doc, filename)
                 self.doc = self.db[self.doc.id] # Get fresh instance
-                comment2 = "filename %s" % filename
-                if comment:
-                    comment2 += '; ' + comment
+                comment = "filename %s" % filename
                 self.log(self.doc.id,
                          'deleted attachment',
                          initial=initial,
-                         comment=comment2)
+                         comment=comment)
 
         # Upload attachment
         try:
@@ -464,13 +449,11 @@ class Entity(Dispatcher):
                                    filename,
                                    field.type)
             self.doc = self.db[self.doc.id] # Get fresh instance
-            comment2 = "filename %s" % filename
-            if comment:
-                comment2 += '; ' + comment
+            comment = "filename %s" % filename
             self.log(self.doc.id,
                      'uploaded attachment',
                      initial=initial,
-                     comment=comment2)
+                     comment=comment)
 
         # Remove tags
         initial = dict(self.doc)
